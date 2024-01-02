@@ -1,0 +1,34 @@
+<!-- base_generic.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ... existing head content ... -->
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Django App{% endblock %}</title>
+    <!-- Add Materialize CSS link -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col s3">
+                <ul class="collection with-header">
+                    <li class="collection-header"><h4>Options</h4></li>
+                    <li class="collection-item"><a href="{% url 'index' %}">Home</a></li>
+                    <li class="collection-item"><a href="{% url 'import_file_1' %}">Import File #1</a></li>
+                    <li class="collection-item"><a href="{% url 'import_file_2' %}">Import File #2</a></li>
+                </ul>
+            </div>
+            <div class="col s9">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>

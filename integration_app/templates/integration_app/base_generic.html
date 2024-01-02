@@ -13,19 +13,27 @@
 </head>
 <body>
     <div class="container">
-        <div class="row">
-            <div class="col s3">
-                <ul class="collection with-header">
-                    <li class="collection-header"><h4>Options</h4></li>
-                    <li class="collection-item"><a href="{% url 'index' %}">Home</a></li>
-                    <li class="collection-item"><a href="{% url 'import_file_1' %}">Import File #1</a></li>
-                    <li class="collection-item"><a href="{% url 'import_file_2' %}">Import File #2</a></li>
-                </ul>
+      
+        <nav>
+         
+            <div class="nav-content">
+
+                <ul class="tabs tabs-transparent">
+
+                <li class="tab"><a class="active" href="{% url 'index' %}">Home</a></li>
+                <li class="tab"><a href="{% url 'import_file_1' %}">Import File #1</a></li>
+                <li class="tab"><a href="{% url 'import_file_2' %}">Import File #2</a></li>
+
+                </ul> 
+
             </div>
-            <div class="col s9">
-                {% block content %}{% endblock %}
-            </div>
+
+        </nav>
+
+        <div>
+            {% block content %}{% endblock %}
         </div>
+
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>

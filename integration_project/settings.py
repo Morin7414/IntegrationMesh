@@ -14,7 +14,9 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 
+
 load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,6 +30,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', default=False)
+#DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -36,8 +39,10 @@ ALLOWED_HOSTS = ['*']
  
 INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
-   
+
     'assets',
+ 
+    'integration_app',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -45,7 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
    # 'django.contrib.staticfiles',
-    'integration_app'
+   
   
 ]
 
@@ -120,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Regina'
 
 USE_I18N = True
 
@@ -144,3 +149,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Adjust the path as needed
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+

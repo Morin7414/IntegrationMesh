@@ -18,8 +18,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
 
+
+
+admin.site.site_header = 'Technician administration'
+admin.site.site_title = 'Technician admin'
+admin.site.index_title = 'Dashboard'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
  
     path('', lambda request: redirect('admin/')),  # Redirect to your app's URL
 ]
+
+

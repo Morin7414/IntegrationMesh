@@ -1,4 +1,0 @@
-# myapp/views.py
-
-
-

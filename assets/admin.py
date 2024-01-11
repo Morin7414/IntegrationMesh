@@ -9,7 +9,7 @@ class ModelAdmin(admin.ModelAdmin):
     actions = None 
 
 class MachineAdmin(admin.ModelAdmin):
-    list_display = ('serial_number', 'asset_number', 'model_name', 'date_PM')
+    list_display = ('asset_number','model_name','game_theme','serial_number',   'date_PM')
     search_fields = ['serial_number', 'asset_number']  # Add fields you want to search
     actions_on_top = False  # Remove actions dropdown from the top
     actions = None  # Disable the selection checkbox

@@ -29,8 +29,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', default=False)
-#DEBUG = True
+#DEBUG = os.getenv('DEBUG', default=False)
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -38,7 +38,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
  
 INSTALLED_APPS = [
-    'whitenoise.runserver_nostatic',
+   # 'whitenoise.runserver_nostatic',
     'assets',
     'workorder',
     'inventory',
@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    #'django.contrib.staticfiles',
+    'django.contrib.staticfiles',
   
 ]
 

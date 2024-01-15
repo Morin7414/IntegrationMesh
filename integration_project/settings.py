@@ -34,9 +34,12 @@ AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
 AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN')
 DEFAULT_FILE_STORAGE = os.environ.get('DEFAULT_FILE_STORAGE')
 
+# Set the media URL to the S3 domain.
+MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', default=False)
-#DEBUG = True
+#DEBUG = os.getenv('DEBUG', default=False)
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -44,7 +47,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
  
 INSTALLED_APPS = [
-    'whitenoise.runserver_nostatic',
+   # 'whitenoise.runserver_nostatic',
     'assets',
     'workorder',
     'inventory',
@@ -54,7 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-   # 'django.contrib.staticfiles',
+    'django.contrib.staticfiles',
   
 ]
 

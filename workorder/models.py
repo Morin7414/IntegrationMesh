@@ -43,21 +43,21 @@ class WorkOrder (models.Model):
     date_created = models.DateTimeField(default=datetime.today)
     date_closed= models.DateTimeField(blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    image = models.ImageField(upload_to='images/',blank=True,  null =True)
    # type_of_repair =MultiSelectField(choices=REPAIR_CHOICES,max_length=255,blank=True, null =True)
     reason_for_repair =models.CharField(max_length =255, blank = True, null =True)
+    diagnostics = models.TextField(blank = True, null =True)
+    image = models.ImageField(upload_to='images/',blank=True,  null =True)
+    
 
     def __str__(self):
-       return self.image.url if self.image else ''
-    
-    def image_url(self):
-        return self.image.url if self.image else ''
+       return f"{self.machine} {self.reason_for_repair}"
  
 
 class RepairLog(models.Model):
-    troubleshooting_and_repair = models.TextField()
+    diagnostics = models.TextField(blank = True, null =True)
     repair_log = models.ForeignKey(WorkOrder,  on_delete=models.SET_NULL, null=True)
     timestamp  = models.DateTimeField(default=datetime.today)
     user_stamp = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    status = models.CharField(max_length =255, blank = True, null =True)
     
    

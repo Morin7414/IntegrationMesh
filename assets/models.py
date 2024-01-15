@@ -38,13 +38,14 @@ class Model(models.Model):
 class MachineMaster(models.Model):
     asset_number = models.CharField(max_length=255)
     bank =  models.CharField(max_length=255,default='Default Bank')
-    model_name = models.ForeignKey(Model, on_delete=models.PROTECT, null=True)
+  #  model_name = models.ForeignKey(Model, on_delete=models.PROTECT, null=True)
     game_theme = models.CharField(max_length=255)
     serial_number = models.CharField(max_length=255, primary_key=True)
-    date_PM = models.DateField(null=True, blank=True)
+    model_name = models.CharField(max_length=255, null=True, blank=True)
+   # date_PM = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.asset_number}    {self.model_name}   {self.game_theme}"
+        return f"{self.asset_number}    {self.bank}    {self.model_name}   {self.game_theme}"
 
 
 

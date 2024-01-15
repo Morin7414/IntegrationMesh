@@ -27,10 +27,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
+AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN')
+DEFAULT_FILE_STORAGE = os.environ.get('DEFAULT_FILE_STORAGE')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = os.getenv('DEBUG', default=False)
-DEBUG = True
+DEBUG = os.getenv('DEBUG', default=False)
+#DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -38,7 +44,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
  
 INSTALLED_APPS = [
-   # 'whitenoise.runserver_nostatic',
+    'whitenoise.runserver_nostatic',
     'assets',
     'workorder',
     'inventory',
@@ -48,7 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+   # 'django.contrib.staticfiles',
   
 ]
 

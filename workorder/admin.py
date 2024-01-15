@@ -4,8 +4,28 @@ from .models import  RepairLog
 from django import forms
 from django.utils import timezone
 from django.utils.html import format_html
+import boto3
+import base64
 
+def convert_image_to_base64(modeladmin, request, queryset):
+    for obj in queryset:
+        s3_url = obj.image.url  # Replace 'image_field' with your actual image field
+        base64_image = get_base64_from_s3_url(s3_url)
+        # Do something with the base64_image, for example, print it
+        print(base64_image)
+convert_image_to_base64.short_description = "Convert selected images to Base64"
 
+def get_base64_from_s3_url(s3_url):
+    # Assume your S3 bucket is public and the images are accessible without authentication
+    # If your bucket is private, you need to configure Boto3 with your AWS credentials
+    # and update the S3 client accordingly
+    
+    s3_client = boto3.client('s3')
+    print (s3_client)
+    response = s3_client.get_object(Bucket='fortfolio', Key=s3_url.split('/')[-1])
+    image_content = response['Body'].read()
+    base64_image = base64.b64encode(image_content).decode('utf-8')
+    return base64_image
 
 
 class WorkOrderForm(forms.ModelForm):
@@ -43,15 +63,16 @@ class RepairLogInline(admin.TabularInline):
 ### ADMIN    #########################################################
    
 class WorkOrderAdmin(admin.ModelAdmin):
+    actions = [convert_image_to_base64]
     form = WorkOrderForm
     inlines = [RepairLogInline]
 
     actions_on_top = False  # Remove actions dropdown from the top
     actions = None  # Disable the selection checkbox
 
-    list_display = ('status', 'created_by', 'date_created','date_closed', 'display_image')
+    list_display = ('status', 'created_by', 'date_created','date_closed')
     raw_id_fields = ('machine',)
-    readonly_fields = ('date_created', 'created_by', 'date_closed','display_image_preview',)
+    readonly_fields = ('date_created', 'created_by', 'date_closed',)
     
     def save_model(self, request, obj, form, change):
         if not obj.id:
@@ -65,11 +86,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
         return obj.image_url()
     display_image.short_description = 'Image'
 
-    def display_image_preview(self, obj):
-        return format_html('<img src="{}" style="max-height: 200px; max-width: 200px;" />', obj.image_url())
-
-
-    display_image.short_description = 'Image'
+  
 
 
 

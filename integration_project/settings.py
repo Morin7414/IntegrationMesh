@@ -43,6 +43,23 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
+CKEDITOR_UPLOAD_PATH = 'uploads/'
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'width': '100%',
+        'height': 300,
+        'toolbar': 'full',
+        'toolbar_full': [
+            # Customize the toolbar as needed
+            # Example: ['Bold', 'Italic', 'Underline', 'Link', 'Unlink', 'Image']
+            ['Bold', 'Italic', 'Underline', 'Link', 'Unlink'],
+            ['NumberedList', 'BulletedList', 'Outdent', 'Indent'],
+            ['RemoveFormat', 'Source'],
+        ],
+     
+    },
+}
 
 # Application definition
  
@@ -51,13 +68,15 @@ INSTALLED_APPS = [
     'assets',
     'workorder',
     'inventory',
+    'knowledgebase',
+    'ckeditor',
   
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    #'django.contrib.staticfiles',
+  #  'django.contrib.staticfiles',
   
 ]
 
@@ -145,11 +164,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Adjust the path as needed
-
-#STATICFILES_DIRS = [
-   # BASE_DIR / "static",
- 
-#]
 
 
 # Default primary key field type

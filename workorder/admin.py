@@ -5,6 +5,8 @@ from django import forms
 from django.utils import timezone
 from django.utils.html import format_html
 from django.forms import BaseInlineFormSet
+from ckeditor.widgets import CKEditorWidget
+from django.db import models
 
 
 class WorkOrderForm(forms.ModelForm):
@@ -17,28 +19,19 @@ class RepairLogForm(forms.ModelForm):
         model = RepairLog
         #exclude = ['user_stamp', 'date_created']  
         fields = '__all__'
+        widgets = {
+            'description': CKEditorWidget(),
+        }
 
-class RelatedModelInlineFormSet(BaseInlineFormSet):
-    def __init__(self, *args, **kwargs):
-        super(RelatedModelInlineFormSet, self).__init__(*args, **kwargs)
-        self.extra = 0  # Set the initial number of forms to 0
-
-    def clean(self):
-        # Ensure only one form is filled out
-        count = 0
-        for form in self.forms:
-            if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
-                count += 1
-
-        if count > 1:
-            raise forms.ValidationError('Only one entry is allowed.')
-
-    
 ### INLINES############################################################################################################################################
 
 class RepairLogInline(admin.TabularInline):
     model = RepairLog
-    #form = RepairLogForm
+    formfield_overrides = {
+       models.TextField: {'widget': CKEditorWidget},
+    }
+    
+    form = RepairLogForm
    # formset = RelatedModelInlineFormSet  # Use the custom formset
     readonly_fields = ('timestamp', 'user_stamp', 'status', )
     extra = 1
@@ -46,9 +39,9 @@ class RepairLogInline(admin.TabularInline):
         return False  # Disable changing existing records
     def has_delete_permission(self, request, obj=None):
         return False  # Disable deleting existing records
-    def has_add_permission(self, request, obj=None):
+   # def has_add_permission(self, request, obj=None):
         # Disable the "Add another" button
-        return False
+      #  return False
     
     def save_model(self, request, obj, form, change):
         # Set the userstamp to the current logged-in user
@@ -63,6 +56,7 @@ class RepairLogInline(admin.TabularInline):
 ### ADMIN    #########################################################
    
 class WorkOrderAdmin(admin.ModelAdmin):
+    
     form = WorkOrderForm
     inlines = [RepairLogInline]
     actions_on_top = False  # Remove actions dropdown from the top
@@ -81,22 +75,14 @@ class WorkOrderAdmin(admin.ModelAdmin):
     
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-      #  instances = RepairLog.objects.filter(repair_log=obj)
-
-        RepairLog.objects.create(repair_log=obj, status=obj.status, user_stamp=obj.created_by, diagnostics=obj.diagnostics)
-       # RepairLog.objects.create(repair_log=obj, user_stamp=obj.created_by)
-       # RepairLog.objects.create(repair_log=obj, troubleshooting_and_repair=obj.reason_for_repair)
-
-   
- 
-
-
+        RepairLog.objects.create(repair_log=obj, status=obj.status, user_stamp=obj.created_by)
+     
 
 class RepairLogAdmin(admin.ModelAdmin):
     form = RepairLogForm
     list_display = ('repair_log', 'diagnostics',  'timestamp','user_stamp')
-    actions_on_top = False  # Remove actions dropdown from the top
-    actions = None  # Disable the selection checkbox
+   # actions_on_top = False  # Remove actions dropdown from the top
+   # actions = None  # Disable the selection checkbox
 
     def save_model(self, request, obj, form, change):
         if not obj.id:

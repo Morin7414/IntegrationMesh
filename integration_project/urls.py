@@ -32,10 +32,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('workorder/', include('workorder.urls')),
+    path('knowledgebase/', include('knowledgebase.urls')),
     path('', lambda request: redirect('admin/')),  # Redirect to your app's URL
 ]
 
-#if settings.DEBUG:
-  #  urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

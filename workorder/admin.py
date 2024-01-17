@@ -7,6 +7,8 @@ from django.utils.html import format_html
 from django.forms import BaseInlineFormSet
 from ckeditor.widgets import CKEditorWidget
 from django.db import models
+from django.utils.html import mark_safe
+from datetime import datetime
 
 
 class WorkOrderForm(forms.ModelForm):
@@ -19,63 +21,84 @@ class RepairLogForm(forms.ModelForm):
         model = RepairLog
         #exclude = ['user_stamp', 'date_created']  
         fields = '__all__'
-        widgets = {
-            'description': CKEditorWidget(),
-        }
+       # widgets = {
+         # 'description': CKEditorWidget(),
+       # }
 
 ### INLINES############################################################################################################################################
 
 class RepairLogInline(admin.TabularInline):
     model = RepairLog
-    formfield_overrides = {
-       models.TextField: {'widget': CKEditorWidget},
-    }
+   
+    list_display = ('timestamp', 'reason_for_repair', 'user_stamp','status',)
+    readonly_fields = ('timestamp', 'reason_for_repair', 'get_diagnostics','user_stamp','status',)
     
-    form = RepairLogForm
-   # formset = RelatedModelInlineFormSet  # Use the custom formset
-    readonly_fields = ('timestamp', 'user_stamp', 'status', )
     extra = 1
+    ordering = ('-timestamp',) 
     def has_change_permission(self, request, obj=None):
         return False  # Disable changing existing records
     def has_delete_permission(self, request, obj=None):
         return False  # Disable deleting existing records
-   # def has_add_permission(self, request, obj=None):
+    def has_add_permission(self, request, obj=None):
         # Disable the "Add another" button
-      #  return False
-    
-    def save_model(self, request, obj, form, change):
-        # Set the userstamp to the current logged-in user
-       
-        if request.user.is_authenticated:
-            obj.timestamp = timezone.now()
-        obj.save()
+         return False
+    def get_diagnostics(self, obj):
+        return mark_safe(obj.diagnostics)
+    get_diagnostics.short_description = 'diagnostics'
 
+    def get_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)
+        # Exclude the 'diagnostics' field
+        fields = [field for field in fields if field != 'diagnostics']
+        return fields
+    
 
         # Set the timestamp to the current time
    
 ### ADMIN    #########################################################
    
 class WorkOrderAdmin(admin.ModelAdmin):
-    
+    list_display = ( 'status',)
+    list_filter = ('status',)
     form = WorkOrderForm
     inlines = [RepairLogInline]
     actions_on_top = False  # Remove actions dropdown from the top
     actions = None  # Disable the selection checkbox
-    list_display = ('status', 'created_by', 'date_created','date_closed', 'reason_for_repair')
+    list_display = ('machine','status', 'created_by',  'reason_for_repair', 'date_created','date_closed',)
     raw_id_fields = ('machine',)
-    readonly_fields = ('date_created', 'created_by', 'date_closed','display_image')
-    def save_model(self, request, obj, form, change):
-        if not obj.id:
-            print("Hi")
-            obj.user_stamp = request.user
-            obj.date_created = timezone.now()
-        obj.save()
-    def display_image(self, obj):
-        return format_html('<img src="{}" style="max-height: 1000px; max-width: 1000px;" />'.format(obj.image.url))
+    readonly_fields = ('date_created', 'created_by', 'date_closed','display_image',)
+
+    fieldsets = (
+        ('Work Order Information', {
+            'fields': ('status', 'machine', 'date_created', 'date_closed', 'created_by', 'image', 'display_image',),
+        }),
+         ('Troubleshooting & Repair', {
+            'fields': ('reason_for_repair', 'diagnostics'),
+        }),
+    )
     
     def save_model(self, request, obj, form, change):
+        if not obj.created_by:
+            obj.created_by = request.user
+
+         # Check if the status is 'In Service'
+        if obj.status == 'In Service' and not obj.date_closed:
+            obj.date_closed = datetime.now()
+
+        elif obj.status != 'In Service':
+        # If status is not 'In Service', clear date_closed
+            obj.date_closed = None
+
+        RepairLog.objects.create(repair_log=obj, status=obj.status, user_stamp=request.user, reason_for_repair=obj.reason_for_repair, diagnostics =obj.diagnostics)
+        obj.diagnostics = "" 
         super().save_model(request, obj, form, change)
-        RepairLog.objects.create(repair_log=obj, status=obj.status, user_stamp=obj.created_by)
+    
+    
+    def display_image(self, obj):
+        return format_html('<img src="{}" style="max-height: 600px; max-width: 600px;" />'.format(obj.image.url))
+    
+
+ 
      
 
 class RepairLogAdmin(admin.ModelAdmin):
@@ -83,12 +106,12 @@ class RepairLogAdmin(admin.ModelAdmin):
     list_display = ('repair_log', 'diagnostics',  'timestamp','user_stamp')
    # actions_on_top = False  # Remove actions dropdown from the top
    # actions = None  # Disable the selection checkbox
+    def has_module_permission(self, request):
+        # This method determines whether the module (app) is shown in the admin index.
+        # Returning False will hide it from the navigation bar.
+        return False
 
-    def save_model(self, request, obj, form, change):
-        if not obj.id:
-            print("Hi")
-            obj.user_stamp = request.user
-        obj.save()
+ 
 
   
     

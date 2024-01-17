@@ -45,7 +45,7 @@ class MachineMaster(models.Model):
    # date_PM = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.asset_number}    {self.bank}    {self.model_name}   {self.game_theme}"
+        return f"{self.asset_number}    {self.bank}    {self.model_name} "
 
 
 

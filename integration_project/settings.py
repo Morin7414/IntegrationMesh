@@ -39,7 +39,7 @@ MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = os.getenv('DEBUG', default=False)
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -47,7 +47,7 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 
 CKEDITOR_CONFIGS = {
     'default': {
-        'width': '100%',
+        'width': 800,
         'height': 300,
         'toolbar': 'full',
         'toolbar_full': [
@@ -55,10 +55,15 @@ CKEDITOR_CONFIGS = {
             # Example: ['Bold', 'Italic', 'Underline', 'Link', 'Unlink', 'Image']
             ['Bold', 'Italic', 'Underline', 'Link', 'Unlink'],
             ['NumberedList', 'BulletedList', 'Outdent', 'Indent'],
-            ['RemoveFormat', 'Source'],
+            ['RemoveFormat'],
         ],
      
     },
+}
+
+CKEDITOR_SETTINGS = {
+    'allowedContent': True,
+    # other CKEditor options...
 }
 
 # Application definition

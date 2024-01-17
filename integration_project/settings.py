@@ -39,7 +39,7 @@ MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = os.getenv('DEBUG', default=False)
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 

@@ -78,6 +78,8 @@ class WorkOrderAdmin(admin.ModelAdmin):
     )
     
     def save_model(self, request, obj, form, change):
+       
+
         if not obj.created_by:
             obj.created_by = request.user
 
@@ -89,9 +91,15 @@ class WorkOrderAdmin(admin.ModelAdmin):
         # If status is not 'In Service', clear date_closed
             obj.date_closed = None
 
+    
+       
+        super().save_model(request, obj, form, change)
+
         RepairLog.objects.create(repair_log=obj, status=obj.status, user_stamp=request.user, reason_for_repair=obj.reason_for_repair, diagnostics =obj.diagnostics)
         obj.diagnostics = "" 
-        super().save_model(request, obj, form, change)
+        obj.save()
+
+    
     
     
     def display_image(self, obj):

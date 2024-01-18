@@ -46,7 +46,7 @@ class WorkOrder (models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
    # type_of_repair =MultiSelectField(choices=REPAIR_CHOICES,max_length=255,blank=True, null =True)
     reason_for_repair =models.CharField(max_length =255,blank = True, null =True)
-    diagnostics = RichTextField(max_length =255,blank = True, null =True)
+    diagnostics = RichTextField(max_length =500,blank = True, null =True)
     image = models.ImageField(upload_to='images/',blank=True,  null =True)
     
 
@@ -55,6 +55,7 @@ class WorkOrder (models.Model):
  
 
 class RepairLog(models.Model):
+    image = models.ImageField(blank=True,  null =True)
     diagnostics = models.TextField(blank = True, null =True)
     reason_for_repair = RichTextField(blank = True, null =True)
     repair_log = models.ForeignKey(WorkOrder,  on_delete=models.SET_NULL, null=True)

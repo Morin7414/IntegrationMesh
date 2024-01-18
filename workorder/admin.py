@@ -7,14 +7,12 @@ from django.utils.html import mark_safe, escape,strip_tags
 from datetime import datetime
 from django.template.defaultfilters import linebreaksbr
 
-
-
 class WorkOrderForm(forms.ModelForm):
     class Meta:
         model = WorkOrder
         fields = '__all__'
    
-### INLINES############################################################################################################################################
+### INLINES ############################################################################################################################################
 
 class RepairLogInline(admin.TabularInline):
     model = RepairLog
@@ -34,7 +32,7 @@ class RepairLogInline(admin.TabularInline):
          return False
     
     def get_diagnostics(self, obj):
-        max_chars_before_wrap = 20
+        max_chars_before_wrap = 120
         text = strip_tags(obj.diagnostics)
         wrapped_text = f'<div style="word-wrap: break-word; max-width: {max_chars_before_wrap}ch;">{text}</div>'
         return mark_safe(wrapped_text)
@@ -89,9 +87,9 @@ class WorkOrderAdmin(admin.ModelAdmin):
         if not obj.created_by:
             obj.created_by = request.user
          # Check if the status is 'In Service'
-        if obj.status == 'In Service' and not obj.date_closed:
+        if obj.status == 'Repair Completed' and not obj.date_closed:
             obj.date_closed = datetime.now()
-        elif obj.status != 'In Service':
+        elif obj.status != 'Repair Completed':
         # If status is not 'In Service', clear date_closed
             obj.date_closed = None
         super().save_model(request, obj, form, change)
@@ -103,6 +101,12 @@ class WorkOrderAdmin(admin.ModelAdmin):
     def display_image(self, obj):
         return format_html('<img src="{}" style="max-height: 600px; max-width: 600px;" />'.format(obj.image.url))
     
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_save_and_add_another'] = False
+        extra_context['show_delete'] = False
+        return super().change_view(request, object_id, form_url, extra_context=extra_context)
+    
 
 class RepairLogAdmin(admin.ModelAdmin):
     list_display = ('repair_log', 'diagnostics',  'timestamp','user_stamp')
@@ -113,9 +117,6 @@ class RepairLogAdmin(admin.ModelAdmin):
         # Returning False will hide it from the navigation bar.
         return False
 
- 
-
-  
     
 admin.site.register(WorkOrder,  WorkOrderAdmin)
 admin.site.register(RepairLog, RepairLogAdmin)

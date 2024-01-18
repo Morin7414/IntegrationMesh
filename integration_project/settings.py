@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'inventory',
     'knowledgebase',
     'ckeditor',
+    'import_export',
   
     'django.contrib.admin',
     'django.contrib.auth',

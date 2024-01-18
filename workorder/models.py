@@ -1,6 +1,6 @@
 from django.db import models
 from datetime import datetime
-from assets.models import MachineMaster
+from assets.models import EGM
 from django.contrib.auth.models import User
 from multiselectfield import MultiSelectField
 from ckeditor.fields import RichTextField
@@ -11,11 +11,10 @@ from ckeditor.fields import RichTextField
 # Create your models here.
 class WorkOrder (models.Model):
     STATUS_CHOICES = [
-        ('In Service', 'In Service'),
-        ('In Service - Awaiting Parts', 'In Service - Awaiting Parts'),
-        ('Out of Service', 'Out of Service'),
-        ('Diagnostic', 'Diagnostic'),
-         ('Preventative Maintenance', 'Preventative Maintenance'),
+        ('Troubleshooting', 'Troubleshooting'),
+        ('EGM DOWN - Awaiting Parts', 'EGM DOWN - Awaiting Parts'),
+        ('EGM In Service - Awaiting Parts', 'EGM In Service - Awaiting Parts'),
+        ('Repair Completed', 'Repair Completed'),
     ]
 
     REPAIR_CHOICES = (
@@ -39,8 +38,8 @@ class WorkOrder (models.Model):
     ('Backplane Repairs', 'Backplane Repairs'),
 )
 
-    status = models.CharField(max_length=60, choices=STATUS_CHOICES, default='In Service')
-    machine = models.ForeignKey(MachineMaster, on_delete=models.SET_NULL, null=True)
+    status = models.CharField(max_length=60, choices=STATUS_CHOICES, default='Troubleshooting')
+    machine = models.ForeignKey(EGM, on_delete=models.SET_NULL, null=True)
     date_created = models.DateTimeField(default=datetime.today)
     date_closed= models.DateTimeField(blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)

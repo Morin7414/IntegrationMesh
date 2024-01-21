@@ -4,6 +4,10 @@ from assets.models import EGM
 from django.contrib.auth.models import User
 from multiselectfield import MultiSelectField
 from ckeditor.fields import RichTextField
+from storages.backends.s3boto3 import S3Boto3Storage
+from django.conf import settings
+import boto3
+from botocore.exceptions import ClientError
 
 
 
@@ -47,7 +51,6 @@ class WorkOrder (models.Model):
     reason_for_repair =models.CharField(max_length =255,blank = True, null =True)
     diagnostics = RichTextField(max_length =500,blank = True, null =True)
     image = models.ImageField(upload_to='images/',blank=True,  null =True)
-    
 
     def __str__(self):
        return f"Work Order # {self.id}  {self.reason_for_repair}    {self.machine}"
@@ -61,6 +64,7 @@ class RepairLog(models.Model):
     timestamp  = models.DateTimeField(default=datetime.today)
     user_stamp = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length =255, blank = True, null =True)
+
     def __str__(self):
        return f"{self.status}"
     

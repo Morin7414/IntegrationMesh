@@ -6,21 +6,47 @@ from django.utils.html import format_html
 from django.utils.html import mark_safe, escape,strip_tags
 from datetime import datetime
 from django.template.defaultfilters import linebreaksbr
+import logging
+import requests
+from django.forms import BaseInlineFormSet
+from django.forms import ValidationError
+from django.urls import reverse
+from workorder.views import generate_presigned_url 
+
+from django.contrib import messages
+
+from django.conf import settings
+
+import boto3
+from botocore.exceptions import ClientError
+
+logging.basicConfig(filename='debug.log', level=logging.DEBUG)
+
 
 class WorkOrderForm(forms.ModelForm):
     class Meta:
         model = WorkOrder
         fields = '__all__'
-   
+
+
+class RepairLogInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        for form in self.forms:
+            if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
+                if not form.cleaned_data.get('image'):
+                    raise ValidationError('Image is required for each repair log entry.')
+
 ### INLINES ############################################################################################################################################
 
 class RepairLogInline(admin.TabularInline):
     model = RepairLog
-    list_display = ('timestamp', 'reason_for_repair', 'user_stamp','status','display_thumbnail')
-    readonly_fields = ('timestamp', 'reason_for_repair', 'get_diagnostics','user_stamp','status','display_thumbnail', )
+    formset = RepairLogInlineFormSet  # Use the custom formset
+    list_display = ('timestamp', 'reason_for_repair', 'user_stamp','status','image_preview')
+    readonly_fields = ('timestamp', 'reason_for_repair', 'get_diagnostics','user_stamp','status','image_preview', )
     extra = 1
     ordering = ('-timestamp',) 
-   
+
     def has_change_permission(self, request, obj=None):
         return False  # Disable changing existing records
    
@@ -43,23 +69,26 @@ class RepairLogInline(admin.TabularInline):
         fields = [field for field in fields if field not in  ['diagnostics','image']]
         return fields
     
-    def display_thumbnail(self, obj):
-        if obj.image:
-        # Assuming 'image' is the field storing the image file
-            thumbnail_url = obj.image.url  # You need to adjust this based on your model structure
-            s3_base_url = 'https://filefolio.s3.amazonaws.com/'  # Replace with your S3 bucket base URL
+    def image_preview(self, obj):
+        try:
+            if obj.image:
+               # s3_client = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY, region_name='ca-central-1', config=boto3.session.Config(signature_version='s3v4')) 
+               # url = s3_client.generate_presigned_url('get_object',
+                                                  #Params={'Bucket': settings.AWS_STORAGE_BUCKET_NAME, 'Key': f'{obj.image}'},
+                                                  #ExpiresIn=5) 
+                                                 # ExpiresIn=3600)  # URL expires in 1 hour
+                url = reverse('generate_presigned_url') + f'?image_key={obj.image}'
+                logging.debug("Generated URL: %s", url)
 
-        # Check if thumbnail_url already contains the full S3 URL
-            if thumbnail_url.startswith(s3_base_url):
-                s3_url = thumbnail_url
+                return mark_safe(f'<a href="{url}" target="_blank"><img src="{url}" style="max-width: 100px; max-height: 100px;" /></a>')
             else:
-                s3_url = s3_base_url + thumbnail_url
-
-        # You can adjust the width and height as needed
-            return format_html('<a href="{}" target="_blank"><img src="{}" style="max-width: 100px; max-height: 100px;" /></a>', s3_url, thumbnail_url)
-        else:
-            return ''
-
+                return ""  # Return an empty string or any default value when there is no image
+   
+        except ClientError as e:
+           
+            return f"Error generating URL: {e}"
+    image_preview.allow_tags = True
+    image_preview.short_description = 'Image Preview'
     
 ### ADMIN    #########################################################
    
@@ -72,7 +101,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
     actions = None  # Disable the selection checkbox
     list_display = ('machine','status', 'created_by',  'reason_for_repair', 'date_created','date_closed',)
     raw_id_fields = ('machine',)
-    readonly_fields = ('date_created', 'created_by', 'date_closed','display_image',)
+    readonly_fields = ('date_created', 'created_by', 'date_closed')
 
     fieldsets = (
         ('Work Order Information', {
@@ -98,9 +127,6 @@ class WorkOrderAdmin(admin.ModelAdmin):
         obj.image = "" 
         obj.save()
 
-    def display_image(self, obj):
-        return format_html('<img src="{}" style="max-height: 600px; max-width: 600px;" />'.format(obj.image.url))
-    
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
         extra_context['show_save_and_add_another'] = False

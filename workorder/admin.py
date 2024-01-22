@@ -6,7 +6,7 @@ from django import forms
 from django.utils.html import mark_safe, escape,strip_tags
 from datetime import datetime
 import logging
-import requests
+
 from django.forms import BaseInlineFormSet
 from django.forms import ValidationError
 from django.urls import reverse

@@ -1,18 +1,18 @@
-<!-- template.html -->
-<button onclick="loadImage('your_image_key')">Load Image</button>
-<img id="previewImage" style="max-width: 100px; max-height: 100px;" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Page Title</title>
+</head>
+<body>
+    <!-- Other content of your HTML page -->
 
-<script>
-function loadImage(imageKey) {
-    fetch(`/your-app/generate_presigned_url/?image_key=${imageKey}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.url) {
-                document.getElementById('previewImage').src = data.url;
-            } else {
-                console.error('Error:', data.error);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-}
-</script>
+    {% if json_data.url %}
+        <img src="{{ json_data.url }}" alt="Image">
+    {% endif %}
+
+    <!-- Other content of your HTML page -->
+</body>
+</html>

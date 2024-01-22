@@ -39,7 +39,7 @@ MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = os.getenv('DEBUG', default=False)
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -69,20 +69,20 @@ CKEDITOR_SETTINGS = {
 # Application definition
  
 INSTALLED_APPS = [
-  #  'whitenoise.runserver_nostatic',
+    'whitenoise.runserver_nostatic',
     'assets',
     'workorder',
     'inventory',
     'knowledgebase',
     'ckeditor',
     'import_export',
-    'debug_toolbar',
+ #   'debug_toolbar',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+#    'django.contrib.staticfiles',
   
 ]
 
@@ -177,21 +177,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Adjust the path as needed
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',  # Set the desired log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-    },
-}
-def show_toolbar(request):
-    return True
-DEBUG_TOOLBAR_CONFIG = {
-    "SHOW_TOOLBAR_CALLBACK" : show_toolbar,
-}
+
+#def show_toolbar(request):
+  #  return True
+#DEBUG_TOOLBAR_CONFIG = {##
+   # "SHOW_TOOLBAR_CALLBACK" : show_toolbar,
+#}

@@ -1,21 +1,17 @@
+from django.conf import settings
 from django.contrib import admin
 from .models import  WorkOrder
 from .models import  RepairLog
 from django import forms
-from django.utils.html import format_html
 from django.utils.html import mark_safe, escape,strip_tags
 from datetime import datetime
-from django.template.defaultfilters import linebreaksbr
 import logging
 import requests
 from django.forms import BaseInlineFormSet
 from django.forms import ValidationError
 from django.urls import reverse
-from workorder.views import generate_presigned_url 
+from workorder.views import image_data
 
-from django.contrib import messages
-
-from django.conf import settings
 
 import boto3
 from botocore.exceptions import ClientError
@@ -41,7 +37,7 @@ class RepairLogInlineFormSet(BaseInlineFormSet):
 
 class RepairLogInline(admin.TabularInline):
     model = RepairLog
-    formset = RepairLogInlineFormSet  # Use the custom formset
+   # formset = RepairLogInlineFormSet  # Use the custom formset
     list_display = ('timestamp', 'reason_for_repair', 'user_stamp','status','image_preview')
     readonly_fields = ('timestamp', 'reason_for_repair', 'get_diagnostics','user_stamp','status','image_preview', )
     extra = 1
@@ -72,15 +68,19 @@ class RepairLogInline(admin.TabularInline):
     def image_preview(self, obj):
         try:
             if obj.image:
-               # s3_client = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY, region_name='ca-central-1', config=boto3.session.Config(signature_version='s3v4')) 
-               # url = s3_client.generate_presigned_url('get_object',
-                                                  #Params={'Bucket': settings.AWS_STORAGE_BUCKET_NAME, 'Key': f'{obj.image}'},
-                                                  #ExpiresIn=5) 
-                                                 # ExpiresIn=3600)  # URL expires in 1 hour
-                url = reverse('generate_presigned_url') + f'?image_key={obj.image}'
-                logging.debug("Generated URL: %s", url)
-
-                return mark_safe(f'<a href="{url}" target="_blank"><img src="{url}" style="max-width: 100px; max-height: 100px;" /></a>')
+                logging.debug("Image_key!!!: %s", obj.image)
+                image_key = obj.image
+                s3_client = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY, region_name='ca-central-1', config=boto3.session.Config(signature_version='s3v4')) 
+                url = s3_client.generate_presigned_url('get_object',
+                                                  Params={'Bucket': settings.AWS_STORAGE_BUCKET_NAME, 'Key': f'{obj.image}'},
+                                                  ExpiresIn=900) 
+                                                 # ExpiresIn=900)  # URL expires in 1 hour
+              #$  url = reverse('image_data', kwargs={'image_key': image_key})
+             #   url = reverse('workorder:image_data') + f'?image_key={image_key}'
+              # url = reverse('image_data', kwargs={'image_key': f'{image_key}'}
+              #  return mark_safe(f'<a href="{url}" target="_blank"><img src="{url}" style="max-width: 100px; max-height: 100px;" /></a>')
+                return mark_safe(f'<a href="{url}"><img src="{url}" style="max-width: 100px; max-height: 100px;" /></a>')
+             
             else:
                 return ""  # Return an empty string or any default value when there is no image
    

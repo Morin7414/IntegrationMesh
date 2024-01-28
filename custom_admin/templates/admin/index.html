@@ -7,50 +7,56 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=EGM+DOWN+-+Awaiting+Parts">
+            <div class="d-flex justify-content-center">
+            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=Troubleshooting">
             <div class="card text-bg-primary mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">{{ open_tickets }}</h5>
+                    <h5 class="card-title">{{ troubleshooting }}</h5>
                     <p class="card-text">Troubleshooting</p>
                 </div>
             </div>
         </a>
 
         </div>
+    </div>
 
         <div class="col-md-6 col-lg-3 mb-3">
-
+            <div class="d-flex justify-content-center">
+            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=EGM+DOWN+-+Awaiting+Parts">
             <div class="card text-bg-danger mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">{{ closed_tickets }}</h5>
+                    <h5 class="card-title">{{ open_tickets }}</h5>
                     <p class="card-text">Out of Service - Awaiting Parts</p>
                 </div>
             </div>
-
+        </a>
+        </div>
         </div>
 
         <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=EGM+DOWN+-+Awaiting+Parts">
+            <div class="d-flex justify-content-center">
+            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=EGM+In+Service+-+Awaiting+Parts">
             <div class="card text-bg-warning mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">{{ open_tickets }}</h5>
+                    <h5 class="card-title">{{ closed_tickets }}</h5>
                     <p class="card-text">In Service - Awaiting Parts</p>
                 </div>
             </div>
         </a>
-
+         </div>
         </div>
 
         <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=EGM+DOWN+-+Awaiting+Parts">
+            <div class="d-flex justify-content-center">
+            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=Repair+Completed">
             <div class="card text-bg-success mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">{{ open_tickets }}</h5>
+                    <h5 class="card-title">{{ repairs }}</h5>
                     <p class="card-text">Repairs Completed</p>
                 </div>
             </div>
         </a>
-
+        </div>
         </div>
 
         
@@ -65,7 +71,7 @@
     .card {
         border-radius: 0px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        width: 400px; 
+        width: 350px; 
         transition: box-shadow 0.3s ease; /* Add transition for smooth hover effect */
     }
     .card:hover {
@@ -88,7 +94,8 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 400px;
+        height: auto;
+        min-height: 350px;
     }
 </style>
 

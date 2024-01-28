@@ -21,19 +21,27 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
+from custom_admin.admin import custom_admin_site
 
 
 
-admin.site.site_header = 'Technician administration'
-admin.site.site_title = 'Technician admin'
-admin.site.index_title = 'Dashboard'
+
+admin.site.site_header = "Custom Admin Dashboard"
+admin.site.site_title = "Custom Admin Dashboard"
+admin.site.index_title = "Welcome to the Custom Admin Dashboard"
+#admin.site.index_template = 'admin/my_index.html'
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', custom_admin_site.urls), 
+ #   path('admin/', admin.site.urls),
+  #  path('custom_admin/', custom_admin_site.urls),
+ 
 
-    path('workorder/', include('workorder.urls')),
-    path('knowledgebase/', include('knowledgebase.urls')),
-    path('', lambda request: redirect('admin/')),  # Redirect to your app's URL
+  #  path('', include('workorder.urls')),
+  
+ 
+   # path('', lambda request: redirect('admin/')),  # Redirect to your app's URL
 ]
 
 if settings.DEBUG:

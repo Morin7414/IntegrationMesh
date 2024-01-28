@@ -6,21 +6,33 @@ from django.http import JsonResponse
 import boto3
 from botocore.exceptions import ClientError
 from django.conf import settings
-from django.urls import reverse
 from django.views.decorators.http import require_GET
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.views.decorators.http import require_http_methods
-import json
+from .models import WorkOrder
+
+
+def ticket_dashboard(request):
+    print("Closed Tickets:")
+    open_tickets = WorkOrder.objects.filter(status='EGM DOWN - Awaiting Parts').count()
+    closed_tickets = WorkOrder.objects.filter(status='Troubleshooting').count()
+    open_tickets = 0
+    print("Open Tickets:", open_tickets)
+    print("Closed Tickets:", closed_tickets)
+    context = {
+        'open_tickets': open_tickets,
+        'closed_tickets': closed_tickets,
+    }
+
+    print("Open Tickets:", open_tickets)
+    print("Closed Tickets:", closed_tickets)
+    return render(request, 'admin/index.html', context) 
 
 @require_GET
 #@require_http_methods(["GET"])
 def image_data(request, image_key):
     #image_key = request.GET.get('image_key', '')
     if not image_key:
-        logging.debug("There is not image key!!!!!!!!!!!!")
-       
-
+        logging.debug("There is not image key!!!!!!!!!!!!") 
     try:
         logging.debug("MORIN")
 
@@ -48,3 +60,4 @@ def image_data(request, image_key):
     
     except ClientError as e:
         return JsonResponse({'error': f"Error generating URL: {e}"}, status=500)
+    

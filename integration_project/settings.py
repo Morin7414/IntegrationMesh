@@ -70,10 +70,10 @@ CKEDITOR_SETTINGS = {
  
 INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
+    'custom_admin',
     'assets',
     'workorder',
     'inventory',
-    'knowledgebase',
     'ckeditor',
     'import_export',
  #   'debug_toolbar',
@@ -82,7 +82,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-#    'django.contrib.staticfiles',
+  #  'django.contrib.staticfiles',
   
 ]
 
@@ -105,7 +105,7 @@ ROOT_URLCONF = 'integration_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

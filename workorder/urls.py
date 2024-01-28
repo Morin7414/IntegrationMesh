@@ -5,13 +5,13 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import image_data
+
 
 
 
 urlpatterns = [
-   
+    
     #  path('photo/<int:photo_id>/', display_photo, name='display_photo'),
-      path('image_data/<str:image_key>/', image_data, name='image_data'),
- 
+  #    path('image_data/<str:image_key>/', image_data, name='image_data'),
+
 ]

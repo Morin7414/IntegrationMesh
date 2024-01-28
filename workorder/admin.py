@@ -1,5 +1,8 @@
 from django.conf import settings
 from django.contrib import admin
+import requests
+
+
 from .models import  WorkOrder
 from .models import  RepairLog
 from django import forms
@@ -12,11 +15,21 @@ from django.forms import ValidationError
 from django.urls import reverse
 from workorder.views import image_data
 
+from custom_admin.admin import custom_admin_site
+
+
+
+
 
 import boto3
 from botocore.exceptions import ClientError
 
 logging.basicConfig(filename='debug.log', level=logging.DEBUG)
+
+
+
+
+
 
 
 class WorkOrderForm(forms.ModelForm):
@@ -135,6 +148,8 @@ class WorkOrderAdmin(admin.ModelAdmin):
     
 
 class RepairLogAdmin(admin.ModelAdmin):
+
+
     list_display = ('repair_log', 'diagnostics',  'timestamp','user_stamp')
    # actions_on_top = False  # Remove actions dropdown from the top
    # actions = None  # Disable the selection checkbox
@@ -142,7 +157,15 @@ class RepairLogAdmin(admin.ModelAdmin):
         # This method determines whether the module (app) is shown in the admin index.
         # Returning False will hide it from the navigation bar.
         return False
+    
+
+# Register your custom admin site
+#custom_admin_site = CustomAdminSite(name='custom_admin')
+
+# Register models with the custom admin site
+custom_admin_site.register(WorkOrder, WorkOrderAdmin)
 
     
-admin.site.register(WorkOrder,  WorkOrderAdmin)
-admin.site.register(RepairLog, RepairLogAdmin)
+#admin.site.register(WorkOrder,  WorkOrderAdmin)
+#admin.site.register(RepairLog, RepairLogAdmin)
+

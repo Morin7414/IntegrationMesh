@@ -863,7 +863,8 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .dashboard #content {
-    width: 600px;
+ /*   width: 600px;*/
+    width: 100%;
 }
 
 #content-main {
@@ -875,7 +876,7 @@ a.deletelink:focus, a.deletelink:hover {
     float: right;
     width: 260px;
     position: relative;
-    margin-right: -300px;
+  /*  margin-right: -300px;*/
 }
 
 #footer {
@@ -883,7 +884,7 @@ a.deletelink:focus, a.deletelink:hover {
     padding: 10px;
 }
 
-/* COLUMN TYPES */
+/* COLUMN TYPES 
 
 .colMS {
     margin-right: 300px;
@@ -902,7 +903,7 @@ a.deletelink:focus, a.deletelink:hover {
 .colSM #content-main {
     float: right;
 }
-
+*/
 .popup .colM {
     width: auto;
 }

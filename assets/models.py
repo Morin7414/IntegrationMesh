@@ -37,15 +37,16 @@ class Model(models.Model):
 
 class EGM(models.Model):
    # id = models.AutoField(primary_key=True)
-    asset_number = models.CharField(max_length=255, null=True, blank=True)
-    bank = models.CharField(max_length=255,  null=True, blank=True)
-    game_theme = models.CharField(max_length=255,  null=True, blank=True)
-    serial_number = models.CharField(max_length=255,null=True, blank=True)
-    model_name = models.CharField(max_length=255, null=True, blank=True)
+    asset_number = models.CharField(max_length=100, blank = True, null =True)
+    location = models.CharField(max_length=100, blank = True, null =True)
+    model = models.CharField(max_length=100, blank = True, null =True)
+
+    def __str__(self):
+        return self.asset_number
 
  
     def __str__(self):
-        return f"{self.asset_number}    {self.bank}    {self.game_theme} "
+        return f"{self.asset_number}    {self.location}  {self.model}"
 
 
 

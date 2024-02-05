@@ -21,6 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from custom_admin.admin import custom_admin_site
 
+
 admin.site.site_header = "Custom Admin Dashboard"
 admin.site.site_title = "Custom Admin Dashboard"
 admin.site.index_title = "Welcome to the Custom Admin Dashboard"
@@ -30,7 +31,10 @@ urlpatterns = [
     path('admin/', custom_admin_site.urls), 
  #   path('admin/', admin.site.urls),
   #  path('custom_admin/', custom_admin_site.urls),
-  #  path('', include('workorder.urls')),
+    path('', include('workorder.urls')),
+
+
+
     path('', lambda request: redirect('admin/')),  # Redirect to your app's URL
 ]
 

@@ -10,6 +10,22 @@ from django.views.decorators.http import require_GET
 from django.shortcuts import render
 from .models import WorkOrder
 
+from assets.models import EGM
+
+def get_machine_details(request):
+    machine_id = request.GET.get('machine_id')
+    machine = EGM.objects.filter(id=machine_id).first()
+    if machine:
+        data = {
+            'asset_number': machine.asset_number,
+            'location': machine.location,
+            'model': machine.model,
+   
+        }
+        return JsonResponse(data)
+    else:
+        return JsonResponse({}, status=400)
+
 
 def ticket_dashboard(request):
     print("Closed Tickets:")

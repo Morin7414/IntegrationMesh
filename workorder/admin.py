@@ -1,41 +1,38 @@
 from django.conf import settings
 from django.contrib import admin
+from django.db import models 
 import requests
 
+from .models import  WorkOrder,RepairLog
+from assets.models import EGM
 
-from .models import  WorkOrder
-from .models import  RepairLog
 from django import forms
 from django.utils.html import mark_safe, escape,strip_tags
 from datetime import datetime
 import logging
-
 from django.forms import BaseInlineFormSet
 from django.forms import ValidationError
-from django.urls import reverse
-from workorder.views import image_data
-
 from custom_admin.admin import custom_admin_site
-
-
-
-
-
 import boto3
 from botocore.exceptions import ClientError
+
+
+
 
 logging.basicConfig(filename='debug.log', level=logging.DEBUG)
 
 
 
 
-
-
+from django.urls import reverse
 
 class WorkOrderForm(forms.ModelForm):
     class Meta:
         model = WorkOrder
         fields = '__all__'
+
+
+
 
 
 class RepairLogInlineFormSet(BaseInlineFormSet):
@@ -112,16 +109,18 @@ class WorkOrderAdmin(admin.ModelAdmin):
     inlines = [RepairLogInline]
     actions_on_top = False  # Remove actions dropdown from the top
     actions = None  # Disable the selection checkbox
-    list_display = ('machine','status', 'created_by',  'reason_for_repair', 'date_created','date_closed',)
+    list_display = ('asset_number','location', 'model','status', 'created_by',  'reason_for_repair', 'date_created','date_closed',)
     raw_id_fields = ('machine',)
-    readonly_fields = ('date_created', 'created_by', 'date_closed')
+
+    #readonly_fields = ('date_created', 'created_by', 'date_closed')
+    readonly_fields = ( 'created_by',)
 
     fieldsets = (
         ('Work Order Information', {
-            'fields': ('status', 'machine', 'date_created', 'date_closed', 'created_by',),
+            'fields': ('status', 'machine', 'asset_number', 'location', 'model', 'date_created', 'date_closed', 'created_by',),
         }),
          ('Troubleshooting & Repair', {
-            'fields': ('image', 'reason_for_repair', 'diagnostics'),
+            'fields': ('image', 'reason_for_repair', 'recent_update','diagnostics'),
         }),
     )
     
@@ -129,8 +128,8 @@ class WorkOrderAdmin(admin.ModelAdmin):
         if not obj.created_by:
             obj.created_by = request.user
          # Check if the status is 'In Service'
-        if obj.status == 'Repair Completed' and not obj.date_closed:
-            obj.date_closed = datetime.now()
+      #  if obj.status == 'Repair Completed' and not obj.date_closed:
+       #     obj.date_closed = datetime.now()
         elif obj.status != 'Repair Completed':
         # If status is not 'In Service', clear date_closed
             obj.date_closed = None
@@ -145,11 +144,17 @@ class WorkOrderAdmin(admin.ModelAdmin):
         extra_context['show_save_and_add_another'] = False
         extra_context['show_delete'] = False
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
+      
+    class Media:
+        js = ('workorder/workorder_admin.js',)  # Path to your JavaScript file
+
+
+
+    
+
     
 
 class RepairLogAdmin(admin.ModelAdmin):
-
-
     list_display = ('repair_log', 'diagnostics',  'timestamp','user_stamp')
    # actions_on_top = False  # Remove actions dropdown from the top
    # actions = None  # Disable the selection checkbox
@@ -157,7 +162,6 @@ class RepairLogAdmin(admin.ModelAdmin):
         # This method determines whether the module (app) is shown in the admin index.
         # Returning False will hide it from the navigation bar.
         return False
-    
 
 # Register your custom admin site
 #custom_admin_site = CustomAdminSite(name='custom_admin')

@@ -2,12 +2,10 @@ from django.db import models
 from datetime import datetime
 from assets.models import EGM
 from django.contrib.auth.models import User
-from multiselectfield import MultiSelectField
 from ckeditor.fields import RichTextField
-from storages.backends.s3boto3 import S3Boto3Storage
 from django.conf import settings
-import boto3
-from botocore.exceptions import ClientError
+
+
 
 
 
@@ -15,10 +13,10 @@ from botocore.exceptions import ClientError
 # Create your models here.
 class WorkOrder (models.Model):
     STATUS_CHOICES = [
-        ('Troubleshooting', 'Troubleshooting'),
-        ('EGM DOWN - Awaiting Parts', 'EGM DOWN - Awaiting Parts'),
-        ('EGM In Service - Awaiting Parts', 'EGM In Service - Awaiting Parts'),
-        ('Repair Completed', 'Repair Completed'),
+        ('MACHINE TROUBLESHOOTING', 'TROUBLESHOOTING'),
+        ('MACHINE DOWN - AWAITNG PARTS', 'MACHINE DOWN - AWAITNG PARTS'),
+        ('MACHINE IN SERVICE - AWAITNG PARTS', 'MACHINE IN SERVICE - AWAITNG PARTS'),
+        ('REPAIR COMPLETED', 'REPAIR COMPLETED'),
     ]
 
     REPAIR_CHOICES = (
@@ -52,8 +50,14 @@ class WorkOrder (models.Model):
     diagnostics = RichTextField(max_length =500,blank = True, null =True)
     image = models.ImageField(upload_to='images/',blank=True,  null =True)
 
+    asset_number = models.CharField(max_length=255, null=True, blank=True)
+    location = models.CharField(max_length=255,  null=True, blank=True)
+    model = models.CharField(max_length=255,  null=True, blank=True)
+    recent_update = models.CharField(max_length=255,  null=True, blank=True)
+
+ 
     def __str__(self):
-       return f"Work Order # {self.id}  {self.reason_for_repair}    {self.machine}"
+       return f"Work Order # {self.id}  {self.machine}"
  
 
 class RepairLog(models.Model):
@@ -68,4 +72,3 @@ class RepairLog(models.Model):
     def __str__(self):
        return f"{self.status}"
     
-   

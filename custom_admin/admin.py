@@ -12,10 +12,10 @@ class CustomAdminSite(admin.AdminSite):
         print ('hi')
 
         # Your logic for fetching ticket counts
-        troubleshooting = WorkOrder.objects.filter(status='Troubleshooting').count()
-        open_tickets_count = WorkOrder.objects.filter(status='EGM DOWN - Awaiting Parts').count()
-        closed_tickets_count = WorkOrder.objects.filter(status='EGM In Service - Awaiting Parts').count()
-        repairs = WorkOrder.objects.filter(status='Repair Completed').count()
+        troubleshooting = WorkOrder.objects.filter(status='TROUBLESHOOTING').count()
+        open_tickets_count = WorkOrder.objects.filter(status='MACHINE DOWN - AWAITNG PARTS').count()
+        closed_tickets_count = WorkOrder.objects.filter(status='MACHINE IN SERVICE - AWAITNG PARTS').count()
+        repairs = WorkOrder.objects.filter(status='REPAIR COMPLETED').count()
      
 
         # Add ticket counts to the context

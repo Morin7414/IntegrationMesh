@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="d-flex justify-content-center">
-            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=Troubleshooting">
+            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=MACHINE+TROUBLESHOOTING">
             <div class="card text-bg-primary mb-3">
                 <div class="card-body">
                     <h5 class="card-title">{{ troubleshooting }}</h5>
@@ -22,7 +22,7 @@
 
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="d-flex justify-content-center">
-            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=EGM+DOWN+-+Awaiting+Parts">
+            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=MACHINE+DOWN+-+AWAITNG+PARTS">
             <div class="card text-bg-danger mb-3">
                 <div class="card-body">
                     <h5 class="card-title">{{ open_tickets }}</h5>
@@ -35,7 +35,7 @@
 
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="d-flex justify-content-center">
-            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=EGM+In+Service+-+Awaiting+Parts">
+            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=MACHINE+IN+SERVICE+-+AWAITNG+PARTS">
             <div class="card text-bg-warning mb-3">
                 <div class="card-body">
                     <h5 class="card-title">{{ closed_tickets }}</h5>
@@ -48,7 +48,7 @@
 
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="d-flex justify-content-center">
-            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=Repair+Completed">
+            <a href="{% url 'admin:workorder_workorder_changelist' %}?status__exact=REPAIR+COMPLETED">
             <div class="card text-bg-success mb-3">
                 <div class="card-body">
                     <h5 class="card-title">{{ repairs }}</h5>

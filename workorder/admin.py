@@ -1,11 +1,7 @@
 from django.conf import settings
 from django.contrib import admin
-from django.db import models 
-import requests
-
 from .models import  WorkOrder,RepairLog
 from assets.models import EGM
-
 from django import forms
 from django.utils.html import mark_safe, escape,strip_tags
 from datetime import datetime
@@ -15,25 +11,13 @@ from django.forms import ValidationError
 from custom_admin.admin import custom_admin_site
 import boto3
 from botocore.exceptions import ClientError
-
-
-
-
-logging.basicConfig(filename='debug.log', level=logging.DEBUG)
-
-
-
-
 from django.urls import reverse
+#logging.basicConfig(filename='debug.log', level=logging.DEBUG)
 
 class WorkOrderForm(forms.ModelForm):
     class Meta:
         model = WorkOrder
         fields = '__all__'
-
-
-
-
 
 class RepairLogInlineFormSet(BaseInlineFormSet):
     def clean(self):
@@ -120,7 +104,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
             'fields': ('status', 'machine', 'asset_number', 'location', 'model', 'date_created', 'date_closed', 'created_by',),
         }),
          ('Troubleshooting & Repair', {
-            'fields': ('image', 'reason_for_repair', 'recent_update','diagnostics'),
+            'fields': ('image', 'reason_for_repair','diagnostics'),
         }),
     )
     
@@ -149,11 +133,6 @@ class WorkOrderAdmin(admin.ModelAdmin):
         js = ('workorder/workorder_admin.js',)  # Path to your JavaScript file
 
 
-
-    
-
-    
-
 class RepairLogAdmin(admin.ModelAdmin):
     list_display = ('repair_log', 'diagnostics',  'timestamp','user_stamp')
    # actions_on_top = False  # Remove actions dropdown from the top
@@ -162,14 +141,10 @@ class RepairLogAdmin(admin.ModelAdmin):
         # This method determines whether the module (app) is shown in the admin index.
         # Returning False will hide it from the navigation bar.
         return False
-
 # Register your custom admin site
 #custom_admin_site = CustomAdminSite(name='custom_admin')
-
 # Register models with the custom admin site
 custom_admin_site.register(WorkOrder, WorkOrderAdmin)
-
-    
 #admin.site.register(WorkOrder,  WorkOrderAdmin)
 #admin.site.register(RepairLog, RepairLogAdmin)
 

@@ -1,0 +1,19 @@
+
+
+#content {
+    padding: 0px 0px;
+}
+.colMS {
+    margin-right: 0px;
+}
+*, ::after, ::before {
+    box-sizing: border-box;
+}
+
+div {
+    display: block;
+}
+
+.dashboard #content {
+    width: 100%;
+}

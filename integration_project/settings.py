@@ -43,38 +43,17 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
-CKEDITOR_UPLOAD_PATH = 'uploads/'
 
-CKEDITOR_CONFIGS = {
-    'default': {
-        'width': 800,
-        'height': 300,
-        'toolbar': 'full',
-        'toolbar_full': [
-            # Customize the toolbar as needed
-            # Example: ['Bold', 'Italic', 'Underline', 'Link', 'Unlink', 'Image']
-            ['Bold', 'Italic', 'Underline', 'Link', 'Unlink'],
-            ['NumberedList', 'BulletedList', 'Outdent', 'Indent'],
-            ['RemoveFormat'],
-        ],
-     
-    },
-}
-
-CKEDITOR_SETTINGS = {
-    'allowedContent': True,
-    # other CKEditor options...
-}
 
 # Application definition
  
 INSTALLED_APPS = [
-    'whitenoise.runserver_nostatic',
+  # 'whitenoise.runserver_nostatic',
     'custom_admin',
     'assets',
     'workorder',
     'inventory',
-    'ckeditor',
+   # 'ckeditor',
     'import_export',
  #   'debug_toolbar',
     'django.contrib.admin',
@@ -82,14 +61,14 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-  #  'django.contrib.staticfiles',
+    'django.contrib.staticfiles',
   
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+   # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -101,6 +80,27 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'integration_project.urls'
+
+
+
+
+
+
+# Define the directory containing your external JavaScript files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# Use '/staticfiles/' as the URL for serving static files
+STATIC_URL = '/staticfiles/'
+
+# Use the default static files storage
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+# Define the directory where collected static files will be stored
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
 
 TEMPLATES = [
     {
@@ -165,12 +165,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
-STATIC_URL = '/static/'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Adjust the path as needed
 
 
 # Default primary key field type

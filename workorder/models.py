@@ -2,13 +2,8 @@ from django.db import models
 from datetime import datetime
 from assets.models import EGM
 from django.contrib.auth.models import User
-from ckeditor.fields import RichTextField
+#from ckeditor.fields import RichTextField
 from django.conf import settings
-
-
-
-
-
 
 # Create your models here.
 class WorkOrder (models.Model):
@@ -18,7 +13,6 @@ class WorkOrder (models.Model):
         ('MACHINE IN SERVICE - AWAITNG PARTS', 'MACHINE IN SERVICE - AWAITNG PARTS'),
         ('REPAIR COMPLETED', 'REPAIR COMPLETED'),
     ]
-
     REPAIR_CHOICES = (
     ('Lock Repairs', 'Lock Repairs'),
     ('Door/Latch Repair', 'Door/Latch Repair'),
@@ -39,7 +33,6 @@ class WorkOrder (models.Model):
     ('CPU Repairs', 'CPU Repairs'),
     ('Backplane Repairs', 'Backplane Repairs'),
 )
-
     status = models.CharField(max_length=60, choices=STATUS_CHOICES, default='Troubleshooting')
     machine = models.ForeignKey(EGM, on_delete=models.SET_NULL, null=True)
     date_created = models.DateTimeField(default=datetime.today)
@@ -47,23 +40,22 @@ class WorkOrder (models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
    # type_of_repair =MultiSelectField(choices=REPAIR_CHOICES,max_length=255,blank=True, null =True)
     reason_for_repair =models.CharField(max_length =255,blank = True, null =True)
-    diagnostics = RichTextField(max_length =500,blank = True, null =True)
+  #  diagnostics = RichTextField(max_length =500,blank = True, null =True)
+    diagnostics = models.TextField(max_length =500,blank = True, null =True)
     image = models.ImageField(upload_to='images/',blank=True,  null =True)
-
     asset_number = models.CharField(max_length=255, null=True, blank=True)
     location = models.CharField(max_length=255,  null=True, blank=True)
     model = models.CharField(max_length=255,  null=True, blank=True)
-    recent_update = models.CharField(max_length=255,  null=True, blank=True)
+    #recent_update = models.CharField(max_length=255,  null=True, blank=True)
 
- 
     def __str__(self):
        return f"Work Order # {self.id}  {self.machine}"
  
-
 class RepairLog(models.Model):
     image = models.ImageField(blank=True,  null =True)
     diagnostics = models.TextField(blank = True, null =True)
-    reason_for_repair = RichTextField(blank = True, null =True)
+   # reason_for_repair = RichTextField(blank = True, null =True)
+    reason_for_repair = models.TextField(max_length =500,blank = True, null =True)
     repair_log = models.ForeignKey(WorkOrder,  on_delete=models.SET_NULL, null=True)
     timestamp  = models.DateTimeField(default=datetime.today)
     user_stamp = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)

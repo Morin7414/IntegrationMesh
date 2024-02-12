@@ -860,27 +860,22 @@ a.deletelink:focus, a.deletelink:hover {
 
 #content {
     padding: 20px 40px;
-    
 }
 
 .dashboard #content {
- /*   width: 600px;*/
-    width: 600px;
-
+    width: 100%;
 }
 
 #content-main {
     float: left;
     width: 100%;
-    margin: 300px
 }
 
 #content-related {
     float: right;
     width: 260px;
     position: relative;
-    margin-right: -300px;
-  /*  margin-right: -300px;*/
+    margin-right: 0px;
 }
 
 #footer {
@@ -888,20 +883,20 @@ a.deletelink:focus, a.deletelink:hover {
     padding: 10px;
 }
 
-
+/* COLUMN TYPES */
 
 .colMS {
-    margin-right: 300px;
+    margin-right: 0px;
 }
 
 .colSM {
-    margin-left: 300px;
+    margin-left: 0px;
 }
 
 .colSM #content-related {
     float: left;
     margin-right: 0;
-    margin-left: -300px;
+    margin-left: 0px;
 }
 
 .colSM #content-main {

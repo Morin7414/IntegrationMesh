@@ -26,7 +26,7 @@ def get_machine_details(request):
     else:
         return JsonResponse({}, status=400)
 
-
+"""
 def ticket_dashboard(request):
     print("Closed Tickets:")
     open_tickets = WorkOrder.objects.filter(status='EGM DOWN - Awaiting Parts').count()
@@ -42,7 +42,7 @@ def ticket_dashboard(request):
     print("Open Tickets:", open_tickets)
     print("Closed Tickets:", closed_tickets)
     return render(request, 'admin/index.html', context) 
-
+"""
 @require_GET
 #@require_http_methods(["GET"])
 def image_data(request, image_key):

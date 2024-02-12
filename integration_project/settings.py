@@ -39,7 +39,7 @@ MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = os.getenv('DEBUG', default=False)
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-  #  'django.contrib.staticfiles',
+   # 'django.contrib.staticfiles',
   
 ]
 
@@ -87,9 +87,9 @@ ROOT_URLCONF = 'integration_project.urls'
 
 
 # Define the directory containing your external JavaScript files
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+#STATICFILES_DIRS = [
+ #   os.path.join(BASE_DIR, 'static'),
+#]
 
 # Use '/staticfiles/' as the URL for serving static files
 STATIC_URL = '/staticfiles/'

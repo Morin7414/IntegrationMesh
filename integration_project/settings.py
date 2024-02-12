@@ -48,7 +48,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
  
 INSTALLED_APPS = [
-  # 'whitenoise.runserver_nostatic',
+   'whitenoise.runserver_nostatic',
     'custom_admin',
     'assets',
     'workorder',
@@ -61,14 +61,14 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+  #  'django.contrib.staticfiles',
   
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-   # 'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

@@ -1,4 +1,6 @@
 from django.contrib import admin
+
+from custom_admin.admin import custom_admin_site
 from .models import  InventoryItem, PartsOrder
 
 #class PartRequiredInline(admin.TabularInline):
@@ -15,5 +17,5 @@ class PartsOrderAdmin(admin.ModelAdmin):
     actions = None  # Disable the selection checkbox
     raw_id_fields = ('inventory',)
 
-admin.site.register(InventoryItem, InventoryItemAdmin) 
-admin.site.register(PartsOrder, PartsOrderAdmin)
+#custom_admin_site.register(InventoryItem, InventoryItemAdmin) 
+#custom_admin_site.register(PartsOrder, PartsOrderAdmin)

@@ -111,12 +111,12 @@ class WorkOrderAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not obj.created_by:
             obj.created_by = request.user
-         # Check if the status is 'In Service'
-      #  if obj.status == 'Repair Completed' and not obj.date_closed:
-       #     obj.date_closed = datetime.now()
-        elif obj.status != 'Repair Completed':
-        # If status is not 'In Service', clear date_closed
+       
+        #if obj.status == 'REPAIR COMPLETED' and not obj.date_closed:
+         #  obj.date_closed = datetime.now()
+        elif obj.status != 'REPAIR COMPLETED':
             obj.date_closed = None
+
         super().save_model(request, obj, form, change)
         RepairLog.objects.create(repair_log=obj, status=obj.status, user_stamp=request.user, reason_for_repair=obj.reason_for_repair, diagnostics =obj.diagnostics, image = obj.image)
         obj.diagnostics = "" 
@@ -137,14 +137,15 @@ class RepairLogAdmin(admin.ModelAdmin):
     list_display = ('repair_log', 'diagnostics',  'timestamp','user_stamp')
    # actions_on_top = False  # Remove actions dropdown from the top
    # actions = None  # Disable the selection checkbox
+ 
     def has_module_permission(self, request):
         # This method determines whether the module (app) is shown in the admin index.
         # Returning False will hide it from the navigation bar.
         return False
+
 # Register your custom admin site
 #custom_admin_site = CustomAdminSite(name='custom_admin')
 # Register models with the custom admin site
 custom_admin_site.register(WorkOrder, WorkOrderAdmin)
-#admin.site.register(WorkOrder,  WorkOrderAdmin)
-#admin.site.register(RepairLog, RepairLogAdmin)
+custom_admin_site.register(RepairLog, RepairLogAdmin)
 

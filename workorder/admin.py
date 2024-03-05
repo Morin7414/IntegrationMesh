@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import admin
-from .models import  WorkOrder,RepairLog
+from .models import  WorkOrder,RepairLog,PartsRequired
 from assets.models import EGM
 from django import forms
 from django.utils.html import mark_safe, escape,strip_tags
@@ -29,6 +29,14 @@ class RepairLogInlineFormSet(BaseInlineFormSet):
 
 ### INLINES ############################################################################################################################################
 
+class PartsRequiredInline(admin.TabularInline):
+    model = PartsRequired
+    list_display = ('inventory', 'quantity','work_order','price_extension')
+    readonly_fields = ('price_extension',)
+    extra = 1
+    raw_id_fields = ('inventory',)
+
+ 
 class RepairLogInline(admin.TabularInline):
     model = RepairLog
    # formset = RepairLogInlineFormSet  # Use the custom formset
@@ -90,7 +98,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
     list_display = ( 'status',)
     list_filter = ('status',)
     form = WorkOrderForm
-    inlines = [RepairLogInline]
+    inlines = [PartsRequiredInline,RepairLogInline]
     actions_on_top = False  # Remove actions dropdown from the top
     actions = None  # Disable the selection checkbox
     list_display = ('asset_number','location', 'model','status', 'created_by',  'reason_for_repair', 'date_created','date_closed',)
@@ -100,12 +108,20 @@ class WorkOrderAdmin(admin.ModelAdmin):
     readonly_fields = ( 'created_by',)
 
     fieldsets = (
+
+       
+
         ('Work Order Information', {
             'fields': ('status', 'machine', 'asset_number', 'location', 'model', 'date_created', 'date_closed', 'created_by',),
+            'classes': ('baton-tabs-init', 'baton-tab-group-fs-diagnostics--inline-repairlog', ),
+            'description': 'This section contains information about the work order.'
         }),
          ('Troubleshooting & Repair', {
-            'fields': ('image', 'reason_for_repair','diagnostics'),
+            'fields': ('image','central_office_remarks', 'reason_for_repair','diagnostics'),
+            'classes': ('tab-fs-diagnostics',),
+            'description': 'This section contains details related to troubleshooting and repair.'
         }),
+      
     )
     
     def save_model(self, request, obj, form, change):
@@ -143,9 +159,20 @@ class RepairLogAdmin(admin.ModelAdmin):
         # Returning False will hide it from the navigation bar.
         return False
 
+class PartRequiredAdmin(admin.ModelAdmin):
+    list_display = 'inventory','quantity', 'remarks'
+    actions_on_top = False  # Remove actions dropdown from the top
+    actions = None  # Disable the selection checkbox
+    raw_id_fields = ('inventory',)
+
 # Register your custom admin site
 #custom_admin_site = CustomAdminSite(name='custom_admin')
 # Register models with the custom admin site
-custom_admin_site.register(WorkOrder, WorkOrderAdmin)
-custom_admin_site.register(RepairLog, RepairLogAdmin)
+#custom_admin_site.register(WorkOrder, WorkOrderAdmin)
+#custom_admin_site.register(RepairLog, RepairLogAdmin)
+#custom_admin_site.register(PartsRequired, PartRequiredAdmin)
+    
 
+admin.site.register(WorkOrder, WorkOrderAdmin)
+admin.site.register(RepairLog, RepairLogAdmin)
+admin.site.register(PartsRequired, PartRequiredAdmin)

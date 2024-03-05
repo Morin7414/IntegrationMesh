@@ -1,9 +1,11 @@
 from django.db import models
 from datetime import datetime
 from assets.models import EGM
+from inventory.models import InventoryItem
 from django.contrib.auth.models import User
 #from ckeditor.fields import RichTextField
 from django.conf import settings
+
 
 # Create your models here.
 class WorkOrder (models.Model):
@@ -46,7 +48,7 @@ class WorkOrder (models.Model):
     asset_number = models.CharField(max_length=255, null=True, blank=True)
     location = models.CharField(max_length=255,  null=True, blank=True)
     model = models.CharField(max_length=255,  null=True, blank=True)
-    #recent_update = models.CharField(max_length=255,  null=True, blank=True)
+    central_office_remarks = models.CharField(max_length=255,  null=True, blank=True)
 
     def __str__(self):
        return f"Work Order # {self.id}  {self.machine}"
@@ -63,4 +65,11 @@ class RepairLog(models.Model):
 
     def __str__(self):
        return f"{self.status}"
+    
+class PartsRequired(models.Model):
+    inventory = models.ForeignKey(InventoryItem,  on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField()
+    remarks = models.CharField(max_length=255)
+    work_order = models.ForeignKey(WorkOrder,  on_delete=models.SET_NULL, null=True)
+    price_extension = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     

@@ -12,9 +12,9 @@ class EGMAdmin(ImportExportModelAdmin, admin.ModelAdmin):
    # raw_id_fields = ('model_name',) #add this for many to many
 
 
-custom_admin_site.register(EGM, EGMAdmin)
+#custom_admin_site.register(EGM, EGMAdmin)
 
-
+admin.site.register(EGM, EGMAdmin)
 
 
 

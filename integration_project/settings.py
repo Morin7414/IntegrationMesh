@@ -52,8 +52,8 @@ INSTALLED_APPS = [
     'assets',
     'workorder',
     'inventory',
-    'baton',
     'import_export',
+    'baton',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -91,7 +91,7 @@ ROOT_URLCONF = 'integration_project.urls'
 #]
 
 # Use '/staticfiles/' as the URL for serving static files
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 
 # Use the default static files storage
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'

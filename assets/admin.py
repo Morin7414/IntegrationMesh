@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import EGM
 from import_export.admin import ImportExportModelAdmin
-from custom_admin.admin import custom_admin_site
+#from custom_admin.admin import custom_admin_site
 
 class EGMAdmin(ImportExportModelAdmin, admin.ModelAdmin):
  #   list_display = ('asset_number','bank','game_theme','serial_number','model_name')

@@ -8,7 +8,7 @@ from datetime import datetime
 import logging
 from django.forms import BaseInlineFormSet
 from django.forms import ValidationError
-from custom_admin.admin import custom_admin_site
+#from custom_admin.admin import custom_admin_site
 import boto3
 from botocore.exceptions import ClientError
 from django.urls import reverse
@@ -101,7 +101,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
     inlines = [PartsRequiredInline,RepairLogInline]
     actions_on_top = False  # Remove actions dropdown from the top
     actions = None  # Disable the selection checkbox
-    list_display = ('asset_number','location', 'model','status', 'created_by',  'reason_for_repair', 'date_created','date_closed',)
+    list_display = ('asset_number','location', 'model','status', 'created_by',  'current_issue','central_office_remarks', 'date_created','date_closed',)
     raw_id_fields = ('machine',)
 
     #readonly_fields = ('date_created', 'created_by', 'date_closed')
@@ -112,12 +112,12 @@ class WorkOrderAdmin(admin.ModelAdmin):
        
 
         ('Work Order Information', {
-            'fields': ('status', 'machine', 'asset_number', 'location', 'model', 'date_created', 'date_closed', 'created_by',),
+            'fields': ('status', 'current_issue','central_office_remarks','machine', 'asset_number', 'location', 'model', 'date_created', 'date_closed', 'created_by', ),
             'classes': ('baton-tabs-init', 'baton-tab-group-fs-diagnostics--inline-repairlog', ),
             'description': 'This section contains information about the work order.'
         }),
          ('Troubleshooting & Repair', {
-            'fields': ('image','central_office_remarks', 'reason_for_repair','diagnostics'),
+            'fields': ('image','diagnostics'),
             'classes': ('tab-fs-diagnostics',),
             'description': 'This section contains details related to troubleshooting and repair.'
         }),
@@ -134,7 +134,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
             obj.date_closed = None
 
         super().save_model(request, obj, form, change)
-        RepairLog.objects.create(repair_log=obj, status=obj.status, user_stamp=request.user, reason_for_repair=obj.reason_for_repair, diagnostics =obj.diagnostics, image = obj.image)
+        RepairLog.objects.create(repair_log=obj, status=obj.status, user_stamp=request.user, reason_for_repair=obj.current_issue, diagnostics =obj.diagnostics, image = obj.image)
         obj.diagnostics = "" 
         obj.image = "" 
         obj.save()

@@ -27,11 +27,11 @@ class CustomAdminSite(admin.AdminSite):
         return super().index(request, extra_context=extra_context)
 
 # Register your custom admin site
-custom_admin_site = CustomAdminSite(name='custom_admin')
 
-custom_admin_site.site_header = "Dashboard"
-custom_admin_site.site_title = "Dashboard"
-custom_admin_site.index_title = "Welcome to the Technician Dashboard"
+#custom_admin_site = CustomAdminSite(name='custom_admin')
+#custom_admin_site.site_header = "Dashboard"
+#custom_admin_site.site_title = "Dashboard"
+#custom_admin_site.index_title = "Welcome to the Technician Dashboard"
 
 # Register models with the custom admin site
 #custom_admin_site.register(WorkOrder)

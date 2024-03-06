@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.shortcuts import redirect
 from django.conf import settings
 from django.conf.urls.static import static
-from custom_admin.admin import custom_admin_site
+#from custom_admin.admin import custom_admin_site
 
 
 admin.site.site_header = "Custom Admin Dashboard"

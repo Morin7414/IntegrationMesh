@@ -48,7 +48,6 @@ ALLOWED_HOSTS = ['*']
  
 INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
-   # 'custom_admin',
     'assets',
     'workorder',
     'inventory',
@@ -59,7 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-   # 'django.contrib.staticfiles',
+ #   'django.contrib.staticfiles',
     'baton.autodiscover',
   
 ]

@@ -99,9 +99,10 @@ class WorkOrderAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     form = WorkOrderForm
     inlines = [PartsRequiredInline,RepairLogInline]
-    actions_on_top = False  # Remove actions dropdown from the top
-    actions = None  # Disable the selection checkbox
-    list_display = ('asset_number','location', 'model','status', 'created_by',  'current_issue','central_office_remarks', 'date_created','date_closed',)
+  #  actions_on_top = False  # Remove actions dropdown from the top
+  #  actions = None  # Disable the selection checkbox
+
+    list_display = ('asset_number','location', 'model','service_status', 'maintenance_ticket','created_by',  'current_issue','central_office_remarks', 'date_created','date_closed',)
     raw_id_fields = ('machine',)
 
     #readonly_fields = ('date_created', 'created_by', 'date_closed')
@@ -109,16 +110,29 @@ class WorkOrderAdmin(admin.ModelAdmin):
 
     fieldsets = (
 
-       
+        ('Machine Info', {
+            'fields': ('service_status','machine','asset_number','location','model',),
+            'description': 'This section contains details related about the machine.'
+        }),
+        ('Troubleshooting & Repair', {
+            'fields': ('image','current_issue','diagnostics'),
+            
+            'description': 'This section contains details related to troubleshooting and repair.'
+        }),
 
         ('Work Order Information', {
-            'fields': ('status', 'current_issue','central_office_remarks','machine', 'asset_number', 'location', 'model', 'date_created', 'date_closed', 'created_by', ),
-            'classes': ('baton-tabs-init', 'baton-tab-group-fs-diagnostics--inline-repairlog', ),
+            'fields': ('maintenance_ticket', 'date_created', 'date_closed', 'created_by', ),
+            'classes': ('baton-tabs-init', 'baton-tab-group-fs-diagnostics--inline-repairlog','baton-tab-group-fs-COreference', ),
             'description': 'This section contains information about the work order.'
         }),
-         ('Troubleshooting & Repair', {
-            'fields': ('image','diagnostics'),
-            'classes': ('tab-fs-diagnostics',),
+       #  ('Troubleshooting & Repair', {
+        #    'fields': ('image','diagnostics'),
+        #    'classes': ('tab-fs-diagnostics',),
+        #    'description': 'This section contains details related to troubleshooting and repair.'
+       # }),
+         ('Central Office Reference', {
+            'fields': ('central_office_remarks',),
+            'classes': ('tab-fs-COreference',),
             'description': 'This section contains details related to troubleshooting and repair.'
         }),
       
@@ -130,11 +144,11 @@ class WorkOrderAdmin(admin.ModelAdmin):
        
         #if obj.status == 'REPAIR COMPLETED' and not obj.date_closed:
          #  obj.date_closed = datetime.now()
-        elif obj.status != 'REPAIR COMPLETED':
+        elif obj.status != 'REPAIRED':
             obj.date_closed = None
 
         super().save_model(request, obj, form, change)
-        RepairLog.objects.create(repair_log=obj, status=obj.status, user_stamp=request.user, reason_for_repair=obj.current_issue, diagnostics =obj.diagnostics, image = obj.image)
+        RepairLog.objects.create(repair_log=obj, status=obj.service_status, user_stamp=request.user, reason_for_repair=obj.current_issue, diagnostics =obj.diagnostics, image = obj.image)
         obj.diagnostics = "" 
         obj.image = "" 
         obj.save()
@@ -175,4 +189,4 @@ class PartRequiredAdmin(admin.ModelAdmin):
 
 admin.site.register(WorkOrder, WorkOrderAdmin)
 admin.site.register(RepairLog, RepairLogAdmin)
-admin.site.register(PartsRequired, PartRequiredAdmin)
+#admin.site.register(PartsRequired, PartRequiredAdmin)

@@ -10,11 +10,17 @@ from django.conf import settings
 # Create your models here.
 class WorkOrder (models.Model):
     STATUS_CHOICES = [
-        ('MACHINE TROUBLESHOOTING', 'TROUBLESHOOTING'),
-        ('MACHINE DOWN - AWAITNG PARTS', 'MACHINE DOWN - AWAITNG PARTS'),
-        ('MACHINE IN SERVICE - AWAITNG PARTS', 'MACHINE IN SERVICE - AWAITNG PARTS'),
-        ('REPAIR COMPLETED', 'REPAIR COMPLETED'),
+        ('TROUBLESHOOTING', 'TROUBLESHOOTING'),
+        ('AWAITNG PARTS', 'AWAITNG PARTS'),
+        ('NEEDS MEM CLEAR', 'NEEDS MEM CLEAR'),
+        ('MONITORING', 'MONITORING'),
+        ('REPAIRED', 'REPAIRED'),
     ]
+    SERVICE_CHOICES = [
+        ('IN SERVICE', 'IN SERVICE'),
+        ('OUT OF SERVICE', 'OUT OF SERVICE'),     
+    ]
+
     REPAIR_CHOICES = (
     ('Lock Repairs', 'Lock Repairs'),
     ('Door/Latch Repair', 'Door/Latch Repair'),
@@ -35,6 +41,8 @@ class WorkOrder (models.Model):
     ('CPU Repairs', 'CPU Repairs'),
     ('Backplane Repairs', 'Backplane Repairs'),
 )
+    service_status = models.CharField(max_length=60, choices=SERVICE_CHOICES, default='IN SERVICE')
+    maintenance_ticket = models.CharField(max_length=60, choices=STATUS_CHOICES, default='TROUBLESHOOTING')
     status = models.CharField(max_length=60, choices=STATUS_CHOICES, default='Troubleshooting')
     machine = models.ForeignKey(EGM, on_delete=models.SET_NULL, null=True)
     date_created = models.DateTimeField(default=datetime.today)

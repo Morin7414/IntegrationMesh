@@ -40,7 +40,7 @@ class EGM(models.Model):
     asset_number = models.CharField(max_length=100, blank = True, null =True)
     location = models.CharField(max_length=100, blank = True, null =True)
     model = models.CharField(max_length=100, blank = True, null =True)
-
+   # maintenance_ticket = models.ForeignKey(WorkOrder,  on_delete=models.SET_NULL, null=True)
     def __str__(self):
         return self.asset_number
 

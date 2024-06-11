@@ -103,9 +103,9 @@ class WorkOrderAdmin(admin.ModelAdmin):
   #  actions = None  # Disable the selection checkbox
 
     list_display = ('asset_number','location', 'model','service_status', 'maintenance_ticket','created_by',  'current_issue','central_office_remarks', 'date_created','date_closed',)
-    raw_id_fields = ('machine',)
+   # raw_id_fields = ('machine',)
 
-    #readonly_fields = ('date_created', 'created_by', 'date_closed')
+    readonly_fields = ('date_created', 'created_by', 'date_closed')
     readonly_fields = ( 'created_by',)
 
     fieldsets = (

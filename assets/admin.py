@@ -6,10 +6,20 @@ from import_export.admin import ImportExportModelAdmin
 
 class WorkOrderInline(admin.TabularInline):
     model = WorkOrder
-    list_display = ('maintenance_ticket','current_issue','central_office_remarks', 'date_created', 'date_closed', 'created_by',)
-   # readonly_fields = ('price_extension',)
+    fields  = ('maintenance_ticket','current_subject','date_created', 'date_closed', 'created_by',)
+    readonly_fields =  ('maintenance_ticket','current_subject','date_created', 'date_closed','created_by',)
     extra = 1
-  #  raw_id_fields = ('inventory',)
+
+    def has_change_permission(self, request, obj=None):
+        return False  # Disable changing existing records
+   
+    def has_delete_permission(self, request, obj=None):
+        return False  # Disable deleting existing records
+   
+    def has_add_permission(self, request, obj=None):
+        # Disable the "Add another" button
+         return False
+
 
 
 class EGMAdmin(ImportExportModelAdmin, admin.ModelAdmin):

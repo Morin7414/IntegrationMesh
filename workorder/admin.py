@@ -102,8 +102,8 @@ class WorkOrderAdmin(admin.ModelAdmin):
   #  actions_on_top = False  # Remove actions dropdown from the top
   #  actions = None  # Disable the selection checkbox
 
-    list_display = ('asset_number','location', 'model','service_status', 'maintenance_ticket','created_by',  'current_issue','central_office_remarks', 'date_created','date_closed',)
-   # raw_id_fields = ('machine',)
+    list_display = ('asset_number','location', 'model','service_status', 'maintenance_ticket','created_by',  'current_subject','central_office_remarks', 'date_created','date_closed',)
+    raw_id_fields = ('machine',)
 
     readonly_fields = ('date_created', 'created_by', 'date_closed')
     readonly_fields = ( 'created_by',)
@@ -115,7 +115,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
             'description': 'This section contains details related about the machine.'
         }),
         ('Troubleshooting & Repair', {
-            'fields': ('image','current_issue','diagnostics'),
+            'fields': ('image','current_subject','diagnostics'),
             
             'description': 'This section contains details related to troubleshooting and repair.'
         }),
@@ -148,7 +148,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
             obj.date_closed = None
 
         super().save_model(request, obj, form, change)
-        RepairLog.objects.create(repair_log=obj, status=obj.service_status, user_stamp=request.user, reason_for_repair=obj.current_issue, diagnostics =obj.diagnostics, image = obj.image)
+        RepairLog.objects.create(repair_log=obj, status=obj.service_status, user_stamp=request.user, reason_for_repair=obj.current_subject, diagnostics =obj.diagnostics, image = obj.image)
         obj.diagnostics = "" 
         obj.image = "" 
         obj.save()

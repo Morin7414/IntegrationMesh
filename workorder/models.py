@@ -49,7 +49,7 @@ class WorkOrder (models.Model):
     date_closed= models.DateTimeField(blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
    # type_of_repair =MultiSelectField(choices=REPAIR_CHOICES,max_length=255,blank=True, null =True)
-    current_issue =models.CharField(max_length =255,blank = True, null =True)
+    current_subject =models.CharField(max_length =255,blank = True, null =True)
   #  diagnostics = RichTextField(max_length =500,blank = True, null =True)
     diagnostics = models.TextField(max_length =500,blank = True, null =True)
     image = models.ImageField(upload_to='images/',blank=True,  null =True)

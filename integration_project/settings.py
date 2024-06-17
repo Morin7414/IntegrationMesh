@@ -14,40 +14,33 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 
-
+# Load environment variables
 load_dotenv()
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
+
+# AWS S3 Configuration
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
 AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN')
 DEFAULT_FILE_STORAGE = os.environ.get('DEFAULT_FILE_STORAGE')
-
-# Set the media URL to the S3 domain.
 MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = os.getenv('DEBUG', default=False)
-DEBUG = False
+DEBUG = os.getenv('DEBUG', default=False)
 ALLOWED_HOSTS = ['*']
 
-
-
 # Application definition
- 
 INSTALLED_APPS = [
-    'whitenoise.runserver_nostatic',
     'assets',
     'workorder',
     'inventory',
@@ -58,9 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
- #   'django.contrib.staticfiles',
+    'django.contrib.staticfiles',
     'baton.autodiscover',
-  
 ]
 
 MIDDLEWARE = [
@@ -73,32 +65,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-
 ]
 
 ROOT_URLCONF = 'integration_project.urls'
 
-
-
-
-
-
-# Define the directory containing your external JavaScript files
-#STATICFILES_DIRS = [
- #   os.path.join(BASE_DIR, 'static'),
-#]
-
-# Use '/staticfiles/' as the URL for serving static files
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
-
-# Use the default static files storage
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-# Define the directory where collected static files will be stored
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
-
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'),
+# ]
 
 TEMPLATES = [
     {
@@ -118,10 +95,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'integration_project.wsgi.application'
 
-
 # Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -132,56 +106,30 @@ DATABASES = {
         'PORT': int(os.getenv('DATABASE_PORT', 5432)),
     }
 }
-# Password validation
-# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
 # Internationalization
-# https://docs.djangoproject.com/en/5.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'America/Regina'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-
-
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#def show_toolbar(request):
-  #  return True
-#DEBUG_TOOLBAR_CONFIG = {##
-   # "SHOW_TOOLBAR_CALLBACK" : show_toolbar,
-#}
-
+# Baton Configuration
 BATON = {
     'SITE_HEADER': 'Speenz',
     'SITE_TITLE': 'Speenz',
-    'INDEX_TITLE': 'Site administration',
-    #'SUPPORT_HREF': 'https://github.com/otto-torino/django-baton/issues',
-    'COPYRIGHT': 'copyright © 2024 Speenz Solutions. All Rights Reserved.', # noqa
+    'INDEX_TITLE': 'Site Administration',
+    'COPYRIGHT': 'Copyright © 2024 Speenz Solutions. All Rights Reserved.',
     'POWERED_BY': 'Speenz Solutions',
     'CONFIRM_UNSAVED_CHANGES': True,
     'SHOW_MULTIPART_UPLOADING': True,
@@ -200,5 +148,83 @@ BATON = {
     'SEARCH_FIELD': {
         'label': 'Search contents...',
         'url': '/search/',
-    }
+    },
+    'MENU': (
+        {
+            'type': 'title',
+            'label': 'main',
+            'apps': ('auth','assets', )
+        },
+        {
+            'type': 'app',
+            'name': 'auth',
+            'label': 'Authentication',
+            'icon': 'fa fa-lock',
+            'models': (
+                {'name': 'user', 'label': 'Users'},
+                {'name': 'group', 'label': 'Groups'},
+            )
+        },
+
+        {
+            'type': 'app',
+            'name': 'assets',
+          
+            'label': 'Assets',
+            'icon': 'fa fa-cogs', 
+            'models': (
+                {'name': 'egm', 'label': 'EGM','icon': 'fa fa-dice'},
+            )
+        },
+
+
+        {
+            'type': 'free',
+            'label': 'Work Orders',
+            'icon': 'fa fa-clipboard-list',
+            'default_open': True,
+            'children': [
+                {
+                    'type': 'free',
+                    'label': f'TROUBLESHOOTING',
+                    'url': '/admin/workorder/workorder/?maintenance_ticket=TROUBLESHOOTING',
+                    'icon': 'fa fa-gavel'
+                },
+
+              
+                {
+                    'type': 'free',
+                    'label': f'AWAITNG PARTS',
+                    'url': '/admin/workorder/workorder/?maintenance_ticket=AWAITNG+PARTS',
+                    'icon': 'fa fa-wrench'
+                },
+
+
+                {
+                    'type': 'free',
+                    'label': f'NEEDS MEMORY CLEAR',
+                    'url': '/admin/workorder/workorder/?maintenance_ticket=NEEDS+MEMORY+CLEAR',
+                    'icon': 'fa fa-memory'
+                },
+                {
+                    'type': 'free',
+                    'label': f'MONITORING',
+                    'url': '/admin/workorder/workorder/?maintenance_ticket=MONITORING',
+                    'icon': 'fa fa-eye'
+                },
+                {
+                    'type': 'free',
+                    'label': f'REPAIRED',
+                    'url': '/admin/workorder/workorder/?maintenance_ticket=REPAIRED',
+                    'icon': 'fa fa-check'
+                },
+                {
+                    'type': 'free',
+                    'label': f'ALL',
+                    'url': '/admin/workorder/workorder/',
+                    'icon': 'fa fa-list'
+                },
+            ]
+        },
+    )
 }

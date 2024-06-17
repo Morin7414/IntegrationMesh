@@ -93,10 +93,38 @@ class RepairLogInline(admin.TabularInline):
     image_preview.short_description = 'Image Preview'
     
 ### ADMIN    #########################################################
-   
+# ('TROUBLESHOOTING', 'TROUBLESHOOTING'),
+   #     ('AWAITNG PARTS', 'AWAITNG PARTS'),
+    #    ('NEEDS MEM CLEAR', 'NEEDS MEM CLEAR'),
+    #    ('MONITORING', 'MONITORING'),
+    #    ('REPAIRED', 'REPAIRED'),
+
+
+
+class StatusFilter(admin.SimpleListFilter):
+    title = 'maintenance_ticket'
+    parameter_name = 'maintenance_ticket'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('AWAITNG PARTS', 'AWAITNG PARTS'),
+            ('NEEDS MEM CLEAR', 'NEEDS MEM CLEAR'),
+            ('REPAIRED', 'REPAIRED'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'AWAITNG PARTS':
+            return queryset.filter(status='AWAITNG PARTS')
+        if self.value() == 'NEEDS MEM CLEAR':
+            return queryset.filter(status='NEEDS MEM CLEAR')
+        if self.value() == 'REPAIRED':
+            return queryset.filter(status='REPAIRED')
+        return queryset  
+    
 class WorkOrderAdmin(admin.ModelAdmin):
-    list_display = ( 'status',)
-    list_filter = ('status',)
+    list_display = ( 'maintenance_ticket',)
+    list_filter = ('maintenance_ticket',)
+ #   list_filter = (StatusFilter,)
     form = WorkOrderForm
     inlines = [PartsRequiredInline,RepairLogInline]
   #  actions_on_top = False  # Remove actions dropdown from the top

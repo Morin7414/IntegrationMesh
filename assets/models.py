@@ -41,9 +41,9 @@ class EGM(models.Model):
     location = models.CharField(max_length=100, blank = True, null =True)
     model = models.CharField(max_length=100, blank = True, null =True)
    # maintenance_ticket = models.ForeignKey(WorkOrder,  on_delete=models.SET_NULL, null=True)
-    def __str__(self):
-        return self.asset_number
-
+   # def __str__(self):
+    #    return self.asset_number
+#
  
     def __str__(self):
         return f"{self.asset_number}    {self.location}  {self.model}"

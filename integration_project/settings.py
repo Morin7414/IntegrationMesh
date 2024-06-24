@@ -14,6 +14,8 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 
+
+
 # Load environment variables
 load_dotenv()
 
@@ -124,6 +126,26 @@ USE_TZ = True
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+
+
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'integration_project.settings')
+django.setup()
+
+from workorder.models import WorkOrder
+
+def get_workorder_counts():
+    return {
+        'troubleshooting_count': WorkOrder.objects.filter(maintenance_ticket='TROUBLESHOOTING').count(),
+        'awaiting_parts_count': WorkOrder.objects.filter(maintenance_ticket='AWAITNG PARTS').count(),
+        'needs_memory_clear_count': WorkOrder.objects.filter(maintenance_ticket='NEEDS MEMORY CLEAR').count(),
+        'monitoring_count': WorkOrder.objects.filter(maintenance_ticket='MONITORING').count(),
+        'repaired_count': WorkOrder.objects.filter(maintenance_ticket='REPAIRED').count(),
+        'all_count': WorkOrder.objects.all().count(),
+    }
+
+workorder_counts = get_workorder_counts()
 # Baton Configuration
 BATON = {
     'SITE_HEADER': 'Speenz',
@@ -186,7 +208,7 @@ BATON = {
             'children': [
                 {
                     'type': 'free',
-                    'label': f'TROUBLESHOOTING',
+                    'label': f'TROUBLESHOOTING ({workorder_counts["troubleshooting_count"]})',
                     'url': '/admin/workorder/workorder/?maintenance_ticket=TROUBLESHOOTING',
                     'icon': 'fa fa-gavel'
                 },
@@ -194,7 +216,7 @@ BATON = {
               
                 {
                     'type': 'free',
-                    'label': f'AWAITNG PARTS',
+                    'label': f'AWAITNG PARTS ({workorder_counts["awaiting_parts_count"]})',
                     'url': '/admin/workorder/workorder/?maintenance_ticket=AWAITNG+PARTS',
                     'icon': 'fa fa-wrench'
                 },
@@ -202,19 +224,19 @@ BATON = {
 
                 {
                     'type': 'free',
-                    'label': f'NEEDS MEMORY CLEAR',
+                    'label': f'NEEDS MEMORY CLEAR ({workorder_counts["needs_memory_clear_count"]})',
                     'url': '/admin/workorder/workorder/?maintenance_ticket=NEEDS+MEMORY+CLEAR',
                     'icon': 'fa fa-memory'
                 },
                 {
                     'type': 'free',
-                    'label': f'MONITORING',
+                    'label': f'MONITORING ({workorder_counts["monitoring_count"]})',
                     'url': '/admin/workorder/workorder/?maintenance_ticket=MONITORING',
                     'icon': 'fa fa-eye'
                 },
                 {
                     'type': 'free',
-                    'label': f'REPAIRED',
+                    'label': f'REPAIRED ({workorder_counts["repaired_count"]})',
                     'url': '/admin/workorder/workorder/?maintenance_ticket=REPAIRED',
                     'icon': 'fa fa-check'
                 },

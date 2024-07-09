@@ -153,7 +153,7 @@ def confirm_updates(request):
                     except IntegrityError as e:
                         print(f"Integrity Error: {e}")
                         print(traceback.format_exc())
-                        return JsonResponse({"error": f"Database integrity error: {str(e).split('\\n')[0]}"}, status=500)
+                        return JsonResponse({"error": f"Database integrity error: {str(e).split('\n')[0]}"}, status=500)
 
             request.session.pop('updates', None)
             request.session.pop('new_records', None)

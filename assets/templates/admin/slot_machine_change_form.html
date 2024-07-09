@@ -1,0 +1,10 @@
+{% extends "admin/change_form.html" %}
+
+{% block submit_buttons_bottom %}
+<!-- Override the submit buttons to hide them -->
+<style>
+    .submit-row input {
+        display: none;
+    }
+</style>
+{% endblock %}

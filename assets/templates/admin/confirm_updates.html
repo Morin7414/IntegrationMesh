@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>Confirm Updates</h1>
+<h2>Updates to be made</h2>
+<ul>
+  {% for update in updates %}
+    <li>Record ID: {{ update.db_row_id }}<br>
+    Changes: 
+    <ul>
+      {% for field, change in update.changes.items %}
+        <li>{{ field }}: {{ change.db_value }} -> {{ change.csv_value }}</li>
+      {% endfor %}
+    </ul>
+    </li>
+  {% endfor %}
+</ul>
+<h2>New Records</h2>
+<ul>
+  {% for record in new_records %}
+    <li>{{ record }}</li>
+  {% endfor %}
+</ul>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="button">Apply Updates</button>
+</form>
+{% endblock %}

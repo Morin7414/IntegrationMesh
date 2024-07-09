@@ -9,17 +9,22 @@ from django.conf import settings
 from django.views.decorators.http import require_GET
 from django.shortcuts import render
 from .models import WorkOrder
+import logging
 
-from assets.models import EGM
+from assets.models import SlotMachine
 
 def get_machine_details(request):
-    machine_id = request.GET.get('machine_id')
-    machine = EGM.objects.filter(id=machine_id).first()
+    print(f"Received request to get details for machine ID: ") 
+    machine_id = request.GET.get('slot_machine')
+    print(f"Received request to get details for machine ID: {machine_id}")  # Log to console
+    
+    machine = SlotMachine.objects.filter(id=machine_id).first()
+    
     if machine:
         data = {
-            'asset_number': machine.asset_number,
-            'location': machine.location,
-            'model': machine.model,
+            'asset_number': machine.slot_machine_name,
+            'location': machine.slot_location,
+            'model': machine.machine_model_name,
    
         }
         return JsonResponse(data)

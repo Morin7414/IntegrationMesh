@@ -1,6 +1,6 @@
 from django.db import models
 from datetime import datetime
-from assets.models import EGM
+from assets.models import EGM,SlotMachine
 from inventory.models import InventoryItem
 from django.contrib.auth.models import User
 #from ckeditor.fields import RichTextField
@@ -44,7 +44,7 @@ class WorkOrder (models.Model):
     service_status = models.CharField(max_length=60, choices=SERVICE_CHOICES, default='IN SERVICE')
     maintenance_ticket = models.CharField(max_length=60, choices=STATUS_CHOICES, default='TROUBLESHOOTING')
     status = models.CharField(max_length=60, choices=STATUS_CHOICES, default='Troubleshooting')
-    machine = models.ForeignKey(EGM, on_delete=models.SET_NULL, null=True)
+  
     date_created = models.DateTimeField(default=datetime.today)
     date_closed= models.DateTimeField(blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
@@ -57,9 +57,10 @@ class WorkOrder (models.Model):
     location = models.CharField(max_length=255,  null=True, blank=True)
     model = models.CharField(max_length=255,  null=True, blank=True)
     central_office_remarks = models.CharField(max_length=255,  null=True, blank=True)
+    slot_machine = models.ForeignKey(SlotMachine, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-       return f"Work Order # {self.id}  {self.machine}"
+       return f"Work Order # {self.id}  {self.slot_machine}"
  
 class RepairLog(models.Model):
     image = models.ImageField(blank=True,  null =True)

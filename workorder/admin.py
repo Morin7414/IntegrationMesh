@@ -81,7 +81,7 @@ class RepairLogInline(admin.TabularInline):
              #   url = reverse('workorder:image_data') + f'?image_key={image_key}'
               # url = reverse('image_data', kwargs={'image_key': f'{image_key}'}
               #  return mark_safe(f'<a href="{url}" target="_blank"><img src="{url}" style="max-width: 100px; max-height: 100px;" /></a>')
-                return mark_safe(f'<a href="{url}"><img src="{url}" style="max-width: 100px; max-height: 100px;" /></a>')
+                return mark_safe(f'<a href="{url}"><img src="{url}" style="max-width: 200px; max-height: 200px;" /></a>')
              
             else:
                 return ""  # Return an empty string or any default value when there is no image
@@ -131,7 +131,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
   #  actions = None  # Disable the selection checkbox
 
     list_display = ('asset_number','location', 'model','service_status', 'maintenance_ticket','created_by',  'current_subject','central_office_remarks', 'date_created','date_closed',)
-    raw_id_fields = ('machine',)
+    raw_id_fields = ('slot_machine',)
 
     readonly_fields = ('date_created', 'created_by', 'date_closed')
     readonly_fields = ( 'created_by',)
@@ -139,7 +139,7 @@ class WorkOrderAdmin(admin.ModelAdmin):
     fieldsets = (
 
         ('Machine Info', {
-            'fields': ('service_status','machine','asset_number','location','model',),
+            'fields': ('service_status','slot_machine','asset_number','location','model',),
             'description': 'This section contains details related about the machine.'
         }),
         ('Troubleshooting & Repair', {

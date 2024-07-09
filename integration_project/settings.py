@@ -192,10 +192,12 @@ BATON = {
             'type': 'app',
             'name': 'assets',
           
-            'label': 'Assets',
+            'label': 'Asset Management',
             'icon': 'fa fa-cogs', 
             'models': (
-                {'name': 'egm', 'label': 'EGM','icon': 'fa fa-dice'},
+              
+                {'name': 'slotmachine', 'label': 'Slot Machine','icon': 'fa fa-coins'},
+                {'name': 'model', 'label': 'Model','icon': 'fa fa-cube'},
             )
         },
 

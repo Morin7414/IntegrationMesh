@@ -35,6 +35,7 @@ urlpatterns = [
 
     path('baton/', include('baton.urls')),
     path('', include('workorder.urls')),
+    path('assets/', include('assets.urls')),
     path('', lambda request: redirect('admin/')),  # Redirect to your app's URL
 ]
 #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

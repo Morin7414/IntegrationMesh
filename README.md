@@ -21,3 +21,5 @@ This command will overwrite your existing requirements.txt file with the current
 reset migrations
 https://simpleisbetterthancomplex.com/tutorial/2016/07/26/how-to-reset-migrations.html
  python manage.py migrate --fake core zero
+
+ gunicorn==21.2.0

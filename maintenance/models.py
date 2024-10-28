@@ -66,21 +66,23 @@ class Task(models.Model):
         return f"Task for {self.maintenance_form} - {self.status}"
     
 
-class PartsUsed(models.Model):
-    maintenance_form = models.ForeignKey(SlotMachineMaintenanceForm, on_delete=models.CASCADE, related_name="parts_used")
+PART_STATUS_CHOICES = [
+    ('PENDING', 'Pending'),        
+    ('SITE_REQ', 'Site Requested'),          # Part requested by the site
+    ('CO_SENT', 'CO Sent'),                  # Central Office sent the part to the site
+    ('CO_ORDERED', 'CO Ordered'),            # Central Office ordered the part (not in stock)
+    ('FULFILLED', 'Fulfilled'),              # Request is complete, and site has received the part
+]
+
+# Unified PartRequired model
+class PartRequired(models.Model):
+    maintenance_form = models.ForeignKey('SlotMachineMaintenanceForm', on_delete=models.CASCADE, related_name="parts_required")
     part = models.ForeignKey(InventoryItem, on_delete=models.CASCADE)
+    price_per_unit = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Price per individual part")
     quantity = models.PositiveIntegerField(default=1)
-    date_used = models.DateTimeField(default=timezone.now)
+    date_requested = models.DateTimeField(default=timezone.now, help_text="Date when the part was requested")
+    date_fulfilled = models.DateTimeField(null=True, blank=True, help_text="Date when the part request was fulfilled")
+    status = models.CharField(max_length=20, choices=PART_STATUS_CHOICES, default='PENDING')
 
     def __str__(self):
-        return f"{self.part} used in {self.maintenance_form}"
-
-class PartsRequested(models.Model):
-    maintenance_form = models.ForeignKey(SlotMachineMaintenanceForm, on_delete=models.CASCADE, related_name="parts_requested")
-    part = models.ForeignKey(InventoryItem, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
-    date_requested = models.DateTimeField(default=timezone.now)
-    status = models.CharField(max_length=20, choices=[('PENDING', 'Pending'), ('FULFILLED', 'Fulfilled')], default='PENDING')
-
-    def __str__(self):
-        return f"{self.part} requested in {self.maintenance_form}"
+        return f"{self.part} - {self.status} in {self.maintenance_form}"

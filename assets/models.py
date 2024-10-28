@@ -37,6 +37,7 @@ class AssetTracker(models.Model):
     slot_location = models.CharField(max_length=100, blank=True, null=True)
     slot_game_name = models.CharField(max_length=100, blank=True, null=True)  # New field
     machine_model_name = models.CharField(max_length=100, blank=True, null=True)  # New field for model name
+    casino_id = models.CharField(max_length=100,blank=True, null=True)
 
     def __str__(self):
         return f"Asset Tracker: {self.machine_serial_number}"

@@ -25,6 +25,7 @@ class SlotMachineMaintenanceFormAdmin(admin.ModelAdmin):
     list_filter = ('maintenance_status', 'operational_status', 'date_created')
     search_fields = ('machine__asset_number', 'issue_description')
     date_hierarchy = 'date_created'
+    raw_id_fields = ('machine',)
     inlines = [TroubleshootingLogInline, TaskInline, PartRequiredInline]
     fieldsets = (
         (None, {

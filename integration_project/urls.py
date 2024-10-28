@@ -27,17 +27,15 @@ from django.conf.urls.static import static
 admin.site.site_header = "Custom Admin Dashboard"
 admin.site.site_title = "Custom Admin Dashboard"
 admin.site.index_title = "Welcome to the Custom Admin Dashboard"
-#admin.site.index_template = 'admin/my_index.html'
+
 
 urlpatterns = [
-  #  path('admin/', custom_admin_site.urls), 
     path('admin/', admin.site.urls),
-
-#   path('baton/', include('baton.urls')),
-
     path('assets/', include('assets.urls')),
+    path('api/', include('maintenance.urls')),  # This includes the urls from `myapp`
     path('', lambda request: redirect('admin/')),  # Redirect to your app's URL
+
 ]
-#+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
 
 

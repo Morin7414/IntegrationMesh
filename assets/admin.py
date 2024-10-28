@@ -19,7 +19,7 @@ class SlotMachineInline(admin.TabularInline):
 
 
 class AssetTrackerAdmin(admin.ModelAdmin):
-    list_display = ('machine_serial_number', 'slot_machine_name', 'slot_location', 'slot_game_name')
+    list_display = ('machine_serial_number', 'slot_machine_name', 'slot_location', 'slot_game_name', 'casino_id')
     search_fields = ('machine_serial_number', 'slot_machine_name', 'slot_location', 'slot_game_name')
     
     

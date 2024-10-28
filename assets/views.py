@@ -22,6 +22,7 @@ def sync_all_asset_trackers(request):
             slot_machine := slot_machines.get(asset.machine_serial_number)
         ) and (
             asset.slot_machine_name != slot_machine.slot_machine_name or
+            asset.casino_id != slot_machine.casino_id or
             asset.slot_location != slot_machine.slot_location or
             asset.slot_game_name != slot_machine.slot_game_name or
             asset.machine_model_name != (
@@ -35,6 +36,7 @@ def sync_all_asset_trackers(request):
     for asset in updated_assets:
         slot_machine = slot_machines.get(asset.machine_serial_number)
         asset.slot_machine_name = slot_machine.slot_machine_name
+        asset.casino_id = slot_machine.casino_id
         asset.slot_location = slot_machine.slot_location
         asset.slot_game_name = slot_machine.slot_game_name
         asset.machine_model_name = (
@@ -46,12 +48,11 @@ def sync_all_asset_trackers(request):
     if to_update:
         AssetTracker.objects.bulk_update(
             to_update,
-            ['slot_machine_name', 'slot_location', 'slot_game_name', 'machine_model_name']
+            ['slot_machine_name', 'slot_location', 'slot_game_name', 'machine_model_name','casino_id']
         )
 
     messages.success(request, f"Successfully synced {len(to_update)} AssetTracker records.")
     return redirect(reverse('admin:assets_assettracker_changelist'))
-
 
 
 def import_csv(request): 

@@ -38,28 +38,29 @@ DEFAULT_FILE_STORAGE = os.environ.get('DEFAULT_FILE_STORAGE')
 MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', default=False)
+#DEBUG = os.getenv('DEBUG', default=False)
+DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
     'assets',
-    'workorder',
+    
+    'maintenance',
     'inventory',
-    'import_export',
-    'baton',
+    'import_export',  # Remove or comment out this line
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'baton.autodiscover',
+
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -72,12 +73,21 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'integration_project.urls'
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+#STATIC_URL = 'static/'
+#STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, 'static'),
 # ]
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/staticfiles/'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+#STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+      os.path.join(BASE_DIR, 'static'),
+]
 
 TEMPLATES = [
     {
@@ -125,130 +135,3 @@ USE_TZ = True
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-
-
-import django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'integration_project.settings')
-django.setup()
-
-from workorder.models import WorkOrder
-
-def get_workorder_counts():
-    return {
-        'troubleshooting_count': WorkOrder.objects.filter(maintenance_ticket='TROUBLESHOOTING').count(),
-        'awaiting_parts_count': WorkOrder.objects.filter(maintenance_ticket='AWAITNG PARTS').count(),
-        'needs_memory_clear_count': WorkOrder.objects.filter(maintenance_ticket='NEEDS MEMORY CLEAR').count(),
-        'monitoring_count': WorkOrder.objects.filter(maintenance_ticket='MONITORING').count(),
-        'repaired_count': WorkOrder.objects.filter(maintenance_ticket='REPAIRED').count(),
-        'all_count': WorkOrder.objects.all().count(),
-    }
-
-workorder_counts = get_workorder_counts()
-# Baton Configuration
-BATON = {
-    'SITE_HEADER': 'Speenz',
-    'SITE_TITLE': 'Speenz',
-    'INDEX_TITLE': 'Site Administration',
-    'COPYRIGHT': 'Copyright © 2024 Speenz Solutions. All Rights Reserved.',
-    'POWERED_BY': 'Speenz Solutions',
-    'CONFIRM_UNSAVED_CHANGES': True,
-    'SHOW_MULTIPART_UPLOADING': True,
-    'ENABLE_IMAGES_PREVIEW': True,
-    'CHANGELIST_FILTERS_IN_MODAL': True,
-    'CHANGELIST_FILTERS_ALWAYS_OPEN': False,
-    'CHANGELIST_FILTERS_FORM': True,
-    'CHANGEFORM_FIXED_SUBMIT_ROW': True,
-    'MENU_ALWAYS_COLLAPSED': False,
-    'MENU_TITLE': 'Menu',
-    'MESSAGES_TOASTS': False,
-    'GRAVATAR_DEFAULT_IMG': 'retro',
-    'GRAVATAR_ENABLED': True,
-    'LOGIN_SPLASH': '/static/core/img/login-splash.png',
-    'FORCE_THEME': None,
-    'SEARCH_FIELD': {
-        'label': 'Search contents...',
-        'url': '/search/',
-    },
-    'MENU': (
-        {
-            'type': 'title',
-            'label': 'main',
-            'apps': ('auth','assets', )
-        },
-        {
-            'type': 'app',
-            'name': 'auth',
-            'label': 'Authentication',
-            'icon': 'fa fa-lock',
-            'models': (
-                {'name': 'user', 'label': 'Users'},
-                {'name': 'group', 'label': 'Groups'},
-            )
-        },
-
-        {
-            'type': 'app',
-            'name': 'assets',
-          
-            'label': 'Asset Management',
-            'icon': 'fa fa-cogs', 
-            'models': (
-              
-                {'name': 'slotmachine', 'label': 'Slot Machine','icon': 'fa fa-coins'},
-                {'name': 'model', 'label': 'Model','icon': 'fa fa-cube'},
-            )
-        },
-
-
-        {
-            'type': 'free',
-            'label': 'Work Orders',
-            'icon': 'fa fa-clipboard-list',
-            'default_open': True,
-            'children': [
-                {
-                    'type': 'free',
-                    'label': f'TROUBLESHOOTING ({workorder_counts["troubleshooting_count"]})',
-                    'url': '/admin/workorder/workorder/?maintenance_ticket=TROUBLESHOOTING',
-                    'icon': 'fa fa-gavel'
-                },
-
-              
-                {
-                    'type': 'free',
-                    'label': f'AWAITNG PARTS ({workorder_counts["awaiting_parts_count"]})',
-                    'url': '/admin/workorder/workorder/?maintenance_ticket=AWAITNG+PARTS',
-                    'icon': 'fa fa-wrench'
-                },
-
-
-                {
-                    'type': 'free',
-                    'label': f'NEEDS MEMORY CLEAR ({workorder_counts["needs_memory_clear_count"]})',
-                    'url': '/admin/workorder/workorder/?maintenance_ticket=NEEDS+MEMORY+CLEAR',
-                    'icon': 'fa fa-memory'
-                },
-                {
-                    'type': 'free',
-                    'label': f'MONITORING ({workorder_counts["monitoring_count"]})',
-                    'url': '/admin/workorder/workorder/?maintenance_ticket=MONITORING',
-                    'icon': 'fa fa-eye'
-                },
-                {
-                    'type': 'free',
-                    'label': f'REPAIRED ({workorder_counts["repaired_count"]})',
-                    'url': '/admin/workorder/workorder/?maintenance_ticket=REPAIRED',
-                    'icon': 'fa fa-check'
-                },
-                {
-                    'type': 'free',
-                    'label': f'ALL',
-                    'url': '/admin/workorder/workorder/',
-                    'icon': 'fa fa-list'
-                },
-            ]
-        },
-    )
-}

@@ -1,0 +1,20 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+
+    <div style="margin-bottom: 15px;">
+        {% if upload_csv_url %}
+            <a href="{{ upload_csv_url }}" class="button" style="margin-right: 10px;">Upload CSV</a>
+        {% endif %}
+        {% if import_serials_url %}
+            <a href="{{ import_serials_url }}" class="button" style="margin-right: 10px;">Import Serial Numbers</a>
+        {% endif %}
+        {% if import_csv_url %}
+            <a href="{{ import_csv_url }}" class="button" style="margin-right: 10px;">Import CSV Data</a>
+        {% endif %}
+        {% if sync_all_url %}
+            <a href="{{ sync_all_url }}" class="button" style="margin-right: 10px;">Sync All AssetTrackers</a>
+        {% endif %}
+    </div>
+    {{ block.super }}
+{% endblock %}

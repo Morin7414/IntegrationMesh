@@ -1,218 +1,258 @@
-# views.py
-import csv
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from django.utils.timezone import now
-from .forms import CSVUploadForm
-from .models import SlotMachine, Model
-from django.db import transaction,IntegrityError
-import traceback
-
+from django.urls import reverse
 from django.contrib import messages
+from django.http import HttpResponseRedirect
+from .models import SlotMachine,AssetTracker,Model
+from django import forms
+import pandas as pd
+from django.template.response import TemplateResponse
 
-def upload_csv(request):
-    if request.method == "POST":
-        form = CSVUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            csv_file = request.FILES['csv_file']
-            try:
-                decoded_file = csv_file.read().decode('utf-8')
-                if decoded_file.startswith('\ufeff'):
-                    decoded_file = decoded_file.lstrip('\ufeff')
-                reader = csv.DictReader(decoded_file.splitlines())
-                csv_data = list(reader)
+class CsvImportForm(forms.Form):
+    csv_upload = forms.FileField()
 
-                existing_data = {sm.machine_serial_number: sm for sm in SlotMachine.objects.all()}
-                model_instances = {model.model_name: model for model in Model.objects.all()}
-                csv_serial_numbers = {row['Machine_Serial_Number'].strip() for row in csv_data}
 
-                current_time = now()
-                updates = []
-                new_records = []
+def sync_all_asset_trackers(request):
+    asset_trackers = AssetTracker.objects.all()
+    slot_machines = SlotMachine.objects.select_related('machine_model_name').in_bulk(field_name='machine_serial_number')
 
-                for serial_number, db_row in existing_data.items():
-                    if serial_number not in csv_serial_numbers and db_row.status != 'offline':
-                        db_row.status = 'offline'
-                        db_row.last_updated = current_time
-                        updates.append({
-                            'machine_serial_number': db_row.machine_serial_number,
-                            'changes': {
-                                'status': 'offline',
-                                'last_updated': current_time.isoformat()
-                            }
-                        })
+    # Use a generator to compare and filter only the changed records
+    updated_assets = (
+        asset for asset in asset_trackers
+        if (
+            slot_machine := slot_machines.get(asset.machine_serial_number)
+        ) and (
+            asset.slot_machine_name != slot_machine.slot_machine_name or
+            asset.slot_location != slot_machine.slot_location or
+            asset.slot_game_name != slot_machine.slot_game_name or
+            asset.machine_model_name != (
+                slot_machine.machine_model_name.model_name if slot_machine.machine_model_name else None
+            )
+        )
+    )
 
-                for csv_row in csv_data:
-                    serial_number = csv_row.get('Machine_Serial_Number', '').strip()
-                    if not serial_number:
-                        continue
+    # Update fields in the filtered records only
+    to_update = []
+    for asset in updated_assets:
+        slot_machine = slot_machines.get(asset.machine_serial_number)
+        asset.slot_machine_name = slot_machine.slot_machine_name
+        asset.slot_location = slot_machine.slot_location
+        asset.slot_game_name = slot_machine.slot_game_name
+        asset.machine_model_name = (
+            slot_machine.machine_model_name.model_name if slot_machine.machine_model_name else None
+        )
+        to_update.append(asset)
 
-                    if serial_number in existing_data:
-                        db_row = existing_data[serial_number]
-                        updated = False
-                        for field in csv_row:
-                            model_field = field.lower()
-                            db_value = getattr(db_row, model_field, None)
-                            csv_value = csv_row[field].strip()
+    # Bulk update only if there are changes
+    if to_update:
+        AssetTracker.objects.bulk_update(
+            to_update,
+            ['slot_machine_name', 'slot_location', 'slot_game_name', 'machine_model_name']
+        )
 
-                            if model_field == 'slot_denomination_value':
-                                db_value = float(db_value) if db_value is not None else None
-                                csv_value = float(csv_value)
-                            elif model_field == 'gaming_day_count':
-                                db_value = int(db_value) if db_value is not None else None
-                                csv_value = int(csv_value)
-                            elif model_field == 'machine_model_name':
-                                db_value = db_value.model_name if db_value else None
-                                csv_value = model_instances.get(csv_value).model_name if csv_value in model_instances else None
+    messages.success(request, f"Successfully synced {len(to_update)} AssetTracker records.")
+    return redirect(reverse('admin:assets_assettracker_changelist'))
 
-                            if db_value != csv_value:
-                                setattr(db_row, model_field, csv_value)
-                                updated = True
 
-                        if db_row.status != 'online':
-                            db_row.status = 'online'
-                            updated = True
 
-                        if updated:
-                            db_row.last_updated = current_time
-                            db_row.save()
-                    else:
-                        new_record = SlotMachine(
-                            machine_serial_number=serial_number,
-                            casino_id=csv_row.get('Casino_ID', '').strip(),
-                            slot_machine_name=csv_row.get('Slot_Machine_Name', '').strip(),
-                            slot_location=csv_row.get('Slot_Location', '').strip(),
-                            slot_cabinet_name=csv_row.get('Slot_Cabinet_Name', '').strip(),
-                            textbox34=csv_row.get('Textbox34', '').strip(),
-                            slot_game_name=csv_row.get('Slot_Game_Name', '').strip(),
-                            machine_model_name=model_instances.get(csv_row.get('Machine_Model_Name', '').strip()) if csv_row.get('Machine_Model_Name', '').strip() else None,
-                            machine_manufacturer_name1=csv_row.get('Machine_Manufacturer_Name1', '').strip(),
-                            slot_denomination=csv_row.get('Slot_Denomination', '').strip(),
-                            slot_denomination_value=float(csv_row.get('Slot_Denomination_Value', '').strip() or 0),
-                            textbox46=csv_row.get('Textbox46', '').strip(),
-                            gaming_day_count=int(csv_row.get('Gaming_Day_Count', '').strip() or 0),
-                            last_updated=current_time,
-                            status='online'
-                        )
-                        try:
-                            new_record.save()
-                        except IntegrityError as e:
-                            print(f"Integrity Error: {e}")
-                            print(traceback.format_exc())
-                            return JsonResponse({"error"}, status=500)
-
-                request.session['updates'] = updates
-                request.session['new_records'] = [record.machine_serial_number for record in new_records]
-                request.session['csv_file'] = csv_file.name
-
-                messages.success(request, "CSV file imported successfully")
-                return redirect('admin:show_updates')
-            except Exception as e:
-                print(f"Error processing CSV file: {e}")
-                print(traceback.format_exc())
-                return JsonResponse({"error": str(e)}, status=500)
-        else:
-            return JsonResponse({"error": "Form is not valid"}, status=400)
-    else:
-        form = CSVUploadForm()
-    return render(request, 'admin/upload_csv.html', {'form': form})
-
-def show_updates(request):
-    updates = request.session.get('updates', [])
-    new_records = request.session.get('new_records', [])
-    csv_file = request.session.get('csv_file', '')
-
-    return render(request, 'admin/show_updates.html', {
-        'updates': updates,
-        'new_records': new_records,
-        'csv_file': csv_file
-    })
-
-def confirm_updates(request):
-    updates = request.session.get('updates', [])
-    new_records = request.session.get('new_records', [])
-
-    if request.method == "POST":
+def import_csv(request): 
+    if request.method == "POST" and request.FILES.get("csv_upload"):
+        csv_file = request.FILES["csv_upload"]
         try:
-            with transaction.atomic():
-                for update in updates:
-                    try:
-                        db_row = SlotMachine.objects.get(machine_serial_number=update['machine_serial_number'])
-                        for field, value in update['changes'].items():
-                            setattr(db_row, field, value)
-                        db_row.save()
-                    except Exception as e:
-                        print(f"Error updating record with serial number {update['machine_serial_number']}: {e}")
-                        print(traceback.format_exc())
-                        return JsonResponse({"error": f"Error updating record with serial number {update['machine_serial_number']}: {e}"}, status=500)
+            # Load and rename columns for SlotMachine model
+            df = pd.read_csv(csv_file)
+            df.rename(columns={
+                'Machine_Serial_Number': 'machine_serial_number',
+                'Casino_ID': 'casino_id',
+                'Slot_Machine_Name': 'slot_machine_name',
+                'Slot_Location': 'slot_location',
+                'Slot_Cabinet_Name': 'slot_cabinet_name',
+                'Slot_Game_Name': 'slot_game_name',
+                'Slot_Denomination': 'slot_denomination',
+                'Slot_Denomination_Value': 'slot_denomination_value',
+                'Slot_Status': 'status',
+                'Machine_Model_Name': 'machine_model_name',
+            }, inplace=True)
 
-                for serial_number in new_records:
-                    try:
-                        new_record = SlotMachine.objects.get(machine_serial_number=serial_number)
-                        new_record.save()
-                    except IntegrityError as e:
-                        print(f"Integrity Error: {e}")
-                        print(traceback.format_exc())
-                        return JsonResponse({"error"}, status=500)
+            # Group denomination values for each unique serial number
+            grouped_df = df.groupby('machine_serial_number').agg({
+                'casino_id': 'first',
+                'slot_machine_name': 'first',
+                'slot_location': 'first',
+                'slot_cabinet_name': 'first',
+                'slot_game_name': 'first',
+                'machine_model_name': 'first',
+                'status': 'first',
+                'slot_denomination': 'first',
+                'slot_denomination_value': lambda x: ', '.join(map(str, x.unique()))
+            }).reset_index()
 
-            request.session.pop('updates', None)
-            request.session.pop('new_records', None)
-            request.session.pop('csv_file', None)
+            # Fetch existing serial numbers and Model instances
+            existing_serials = set(SlotMachine.objects.values_list('machine_serial_number', flat=True))
+            existing_models = {model.model_name: model for model in Model.objects.all()}
 
-            return redirect('admin:success')
-        except Exception as e:
-            print(f"Error applying updates: {e}")
-            print(traceback.format_exc())
-            return JsonResponse({"error": f"Error applying updates: {e}"}, status=500)
+            # Prepare lists for bulk operations
+            new_slot_machines = []
+            updated_slot_machines = []
 
-    return render(request, 'admin/confirm_updates.html', {
-        'updates': updates,
-        'new_records': new_records
-    })
+            for _, row in grouped_df.iterrows():
+                # Get or create the Model instance without hitting the database repeatedly
+                model_instance = existing_models.get(row["machine_model_name"])
+                if not model_instance:
+                    model_instance = Model(model_name=row["machine_model_name"])
+                    model_instance.save()
+                    existing_models[row["machine_model_name"]] = model_instance
 
-def success(request):
-    return render(request, 'admin/success.html')
-
-def import_csv_view(request):
-    if request.method == "POST":
-        form = CSVUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            csv_file = request.FILES['csv_file']
-            decoded_file = csv_file.read().decode('utf-8').splitlines()
-            reader = csv.DictReader(decoded_file)
-
-            new_records = []
-            existing_records = {record.model_name: record for record in  Model.objects.all()}
-
-            for row in reader:
-                model_name = row['model_name']
-                manufacturer = row.get('manufacturer', '')
-                model_type = row.get('model_type', '')
-
-                if model_name not in existing_records:
-                    new_record =  Model(
-                        model_name=model_name,
-                        manufacturer=manufacturer,
-                        model_type=model_type
+                if row["machine_serial_number"] in existing_serials:
+                    # Update existing SlotMachine record
+                    updated_slot_machines.append(
+                        SlotMachine(
+                            machine_serial_number=row["machine_serial_number"],
+                            casino_id=row["casino_id"],
+                            slot_machine_name=row["slot_machine_name"],
+                            slot_location=row["slot_location"],
+                            slot_cabinet_name=row["slot_cabinet_name"],
+                            slot_game_name=row["slot_game_name"],
+                            machine_model_name=model_instance,
+                            slot_denomination=row["slot_denomination"],
+                            slot_denomination_value=row["slot_denomination_value"],
+                            status=row["status"]
+                        )
                     )
-                    new_records.append(new_record)
+                else:
+                    # Create new SlotMachine record
+                    new_slot_machines.append(
+                        SlotMachine(
+                            machine_serial_number=row["machine_serial_number"],
+                            casino_id=row["casino_id"],
+                            slot_machine_name=row["slot_machine_name"],
+                            slot_location=row["slot_location"],
+                            slot_cabinet_name=row["slot_cabinet_name"],
+                            slot_game_name=row["slot_game_name"],
+                            machine_model_name=model_instance,
+                            slot_denomination=row["slot_denomination"],
+                            slot_denomination_value=row["slot_denomination_value"],
+                            status=row["status"]
+                        )
+                    )
 
-            try:
-                with transaction.atomic():
-                    if new_records:
-                        Model.objects.bulk_create(new_records)
-                messages.success(request, "CSV file imported successfully")
-            except Exception as e:
-                messages.error(request, f"Error importing CSV file: {e}")
+            # Bulk create new records
+            if new_slot_machines:
+                SlotMachine.objects.bulk_create(new_slot_machines)
 
-            return redirect('admin:assets_model_changelist')
-    else:
-        form = CSVUploadForm()
+            # Bulk update existing records
+            if updated_slot_machines:
+                SlotMachine.objects.bulk_update(
+                    updated_slot_machines,
+                    ['casino_id', 'slot_machine_name', 'slot_location', 'slot_cabinet_name',
+                     'slot_game_name', 'machine_model_name', 'slot_denomination',
+                     'slot_denomination_value', 'status']
+                )
 
-    context = {
-        'form': form,
-    }
-    return render(request, "admin/upload_csv.html", context)
+            messages.success(request, "CSV file imported successfully.")
+        except Exception as e:
+            messages.error(request, f"Error processing CSV: {e}")
+        
+        return redirect(reverse("admin:assets_slotmachine_changelist"))
 
-def success(request):
-    return render(request, 'admin/success.html')
+    # Render form if GET or no file uploaded
+    form = CsvImportForm()
+    return render(request, "admin/csv_form.html", {"form": form})
+
+def import_serials(request):
+    # Process only if request is POST and contains a file
+    if request.method == "POST" and request.FILES.get("csv_upload"):
+        csv_file = request.FILES["csv_upload"]
+
+        try:
+            # Load the CSV into a DataFrame
+            df = pd.read_csv(csv_file)
+            # Rename columns to match model field names
+            df.rename(columns={'Machine_Serial_Number': 'machine_serial_number'}, inplace=True)
+
+            # Check for required column
+            if 'machine_serial_number' not in df.columns:
+                messages.error(request, "CSV file does not contain a 'machine_serial_number' column.")
+                return redirect(reverse("admin:assets_assettracker_changelist"))
+
+            # Collect unique serials to prevent duplication
+            new_serials = []
+            existing_serials = set(AssetTracker.objects.values_list('machine_serial_number', flat=True))
+
+            # Loop through unique serial numbers and prepare for bulk creation
+            for serial in df['machine_serial_number'].unique():
+                if serial not in existing_serials:
+                    new_serials.append(AssetTracker(machine_serial_number=serial))
+
+            # Perform bulk create if new serials exist
+            if new_serials:
+                AssetTracker.objects.bulk_create(new_serials)
+                messages.success(request, f"Imported {len(new_serials)} new serial numbers.")
+            else:
+                messages.info(request, "No new serial numbers to import.")
+
+        except Exception as e:
+            # Log the error and notify the user
+            messages.error(request, f"Error processing file: {e}")
+            print(f"Exception in import_serials: {e}")  # Debugging information
+
+        # Redirect to the changelist after processing
+        return redirect(reverse("admin:assets_assettracker_changelist"))
+
+    # Render the form if GET request or no file uploaded
+    form = CsvImportForm()
+    return render(request, "admin/csv_form.html", {"form": form})
+
+def import_machine_data(request):
+    if request.method == "POST" and request.FILES.get("csv_upload"):
+        csv_file = request.FILES["csv_upload"]
+
+        try:
+            # Load data from CSV file into DataFrame
+            df = pd.read_csv(csv_file)
+            expected_columns = ['Slot_Cabinet_Name', 'Machine_Model_Name', 'Machine_Manufacturer_Name1']
+            if not all(col in df.columns for col in expected_columns):
+                messages.error(request, "CSV file is missing required columns.")
+                return redirect(reverse("admin:assets_model_changelist"))
+
+            # Step 1: Fetch all existing model names from the database to avoid duplicates
+            existing_models = set(Model.objects.values_list("model_name", flat=True))
+
+            # Step 2: Prepare a list of new Model objects for bulk creation
+            models_to_create = []
+            new_entries = 0
+
+            for _, row in df.iterrows():
+                model_name = row['Machine_Model_Name'].strip()  # Assuming this is the unique name
+                model_type = row['Slot_Cabinet_Name'].strip()
+                manufacturer = row['Machine_Manufacturer_Name1'].strip()
+
+                # Skip if model_name already exists in the database
+                if model_name in existing_models:
+                    continue
+
+                # Add new entry to the list
+                models_to_create.append(
+                    Model(
+                        model_name=model_name,
+                        model_type=model_type,
+                        manufacturer=manufacturer,
+                    )
+                )
+                existing_models.add(model_name)  # Update set to avoid duplicates
+                new_entries += 1
+
+            # Step 3: Bulk create new entries if there are any
+            if models_to_create:
+                Model.objects.bulk_create(models_to_create)
+                messages.success(request, f"{new_entries} new entries added. Existing entries skipped.")
+            else:
+                messages.info(request, "No new entries to add.")
+
+        except Exception as e:
+            messages.error(request, f"Error reading CSV file: {e}")
+
+        return redirect(reverse("admin:assets_model_changelist"))
+
+    # Render form if GET or no file uploaded
+    form = CsvImportForm()
+    return render(request, "admin/csv_form.html", {"form": form})

@@ -1,10 +1,12 @@
 from django.urls import path
 from . import views
+app_name = 'assets'
 
 urlpatterns = [
-    path('upload_csv/', views.upload_csv, name='upload_csv'),
-    path('import_csv_view/', views.import_csv_view, name='import_csv_view'),
-    path('show_updates/', views.show_updates, name='show_updates'),
-    path('confirm_updates/', views.confirm_updates, name='confirm_updates'),
-    path('success/', views.success, name='success'),
+       path('upload-csv/', views.import_csv, name="slotmachine_upload_csv"),
+       path('import-serials/', views.import_serials, name="import_serials"),
+       path('import-machine-data/', views.import_machine_data, name='import_machine_data'),
+       path('sync-all-asset-trackers/', views.sync_all_asset_trackers, name='sync_all_asset_trackers'),
+
+
 ]

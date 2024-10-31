@@ -4,25 +4,22 @@ from .models import AssetTracker, SlotMachine, Model
 from django.urls import reverse, path
 from django.shortcuts import redirect
 from django.conf import settings
+from django import forms
+from django.template.response import TemplateResponse
+from django.shortcuts import render
 
 
-
-
-
-
-
-
-
-class SlotMachineInline(admin.TabularInline):
-    model = SlotMachine
-    fk_name = 'machine_serial_number'  # Use if there's a ForeignKey relationship
+class UpdateMaintenanceDateForm(forms.Form):
+    maintenance_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label="Select Maintenance Date"
+    )
 
 
 class AssetTrackerAdmin(admin.ModelAdmin):
-    list_display = ('machine_serial_number', 'slot_machine_name', 'slot_location', 'slot_game_name', 'casino_id')
-    search_fields = ('machine_serial_number', 'slot_machine_name', 'slot_location', 'slot_game_name')
-    
-    
+    list_display = ('slot_machine_name', 'slot_location', 'slot_game_name', )
+    search_fields = ('slot_machine_name', 'slot_location', 'slot_game_name')
+ 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
         # Pass the URL for the import page to the context

@@ -37,7 +37,16 @@ def sync_all_asset_trackers(request):
         slot_machine = slot_machines.get(asset.machine_serial_number)
         asset.slot_machine_name = slot_machine.slot_machine_name
         asset.casino_id = slot_machine.casino_id
-        asset.slot_location = slot_machine.slot_location
+        #asset.slot_location = slot_machine.slot_location
+       # Safely set and process slot_location
+        slot_location = slot_machine.slot_location
+        if len(slot_location) > 2:
+            slot_location = slot_location[1:-2]  # Remove first and last two characters
+        if  slot_location[1] == "0":
+            
+            slot_location = slot_location[0] + slot_location[2]  # Keep only the first and last characters
+           
+        asset.slot_location = slot_location
         asset.slot_game_name = slot_machine.slot_game_name
         asset.machine_model_name = (
             slot_machine.machine_model_name.model_name if slot_machine.machine_model_name else None

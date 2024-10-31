@@ -1,53 +1,35 @@
 from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from .models import SlotMachineMaintenanceForm
+from assets.models import AssetTracker
 from django.db.models import Count
+from .serializers import AssetTrackerSerializer, SlotMachineMaintenanceFormSerializer
+from django.db.models import Q
 
-class MaintenanceStatusCountView(APIView):
-
+class CasinoOutOfServiceView(APIView):
     def get(self, request):
-        # Count each maintenance status by operational status
-        status_counts = (
-            SlotMachineMaintenanceForm.objects
-            .values('operational_status', 'maintenance_status')
-            .annotate(count=Count('maintenance_status'))
-        )
-        
-        # Structure the data for clarity in JSON response
-        response_data = {
-            "IN_SERVICE": {},
-            "OUT_OF_SERVICE": {}
-        }
-        
-        # Organize counts by operational and maintenance status
-        for entry in status_counts:
-            operational_status = entry['operational_status']
-            maintenance_status = entry['maintenance_status']
-            count = entry['count']
-            
-            if operational_status in response_data:
-                response_data[operational_status][maintenance_status] = count
-        
-        return Response(response_data)
-    
+        # Filter distinct casinos, excluding blank or null Casino_IDs
+        casinos = AssetTracker.objects.filter(~Q(casino_id=""), casino_id__isnull=False).values('casino_id').distinct()
+        response_data = []
 
-class CasinoOutOfServiceCountView(APIView):
-    def get(self, request):
-        # Aggregate out-of-service counts by casino_id through machine relationship
-        out_of_service_counts = (
-            SlotMachineMaintenanceForm.objects
-            .filter(operational_status='OUT_OF_SERVICE')
-            .values('machine__casino_id')  # Access casino_id through machine
-            .annotate(count=Count('id'))
-            .order_by('machine__casino_id')
-        )
+        # Calculate the total out-of-service count across all casinos
+        total_out_of_service = SlotMachineMaintenanceForm.objects.filter(operational_status='OUT_OF_SERVICE').count()
 
-        # Prepare response data, setting zero for any Casino_ID without out-of-service machines
-        response_data = {entry['machine__casino_id']: entry['count'] for entry in out_of_service_counts}
+        for casino in casinos:
+            # Filter machines for each casino that are out of service
+            machines = SlotMachineMaintenanceForm.objects.filter(
+                machine__casino_id=casino['casino_id'],
+                operational_status='OUT_OF_SERVICE'
+            )
+            machine_data = SlotMachineMaintenanceFormSerializer(machines, many=True).data
+            response_data.append({
+                'casino_id': casino['casino_id'],
+                'total_out_of_service': machines.count(),
+                'machines': machine_data
+            })
         
-        # Include all Casino_IDs, setting to zero if there are no out-of-service machines
-        all_casinos = set(SlotMachineMaintenanceForm.objects.values_list('machine__casino_id', flat=True))
-        for casino_id in all_casinos:
-            response_data.setdefault(casino_id, 0)
-
-        return Response(response_data)
+        return Response({
+            'total_out_of_service': total_out_of_service,
+            'casinos': response_data
+        })

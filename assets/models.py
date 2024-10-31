@@ -38,20 +38,11 @@ class AssetTracker(models.Model):
     slot_game_name = models.CharField(max_length=100, blank=True, null=True)  # New field
     machine_model_name = models.CharField(max_length=100, blank=True, null=True)  # New field for model name
     casino_id = models.CharField(max_length=100,blank=True, null=True)
+    preventative_maintenance_date = models.DateField(null=True, blank=True, help_text="Date of the last preventative maintenance")  # New field
 
     def __str__(self):
         return f"Asset Tracker: {self.machine_serial_number}"
-    
-    def sync_with_slot_machine(self):
-        # Sync data from SlotMachine model
-        slot_machine = SlotMachine.objects.filter(machine_serial_number=self.machine_serial_number).first()
-        if slot_machine:
-            self.slot_machine_name = slot_machine.slot_machine_name
-            self.slot_location = slot_machine.slot_location
-            self.slot_game_name = slot_machine.slot_game_name  # Sync slot_game_name
-            self.machine_model_name = slot_machine.machine_model_name.model_name if slot_machine.machine_model_name else None  # Sync machine_model_name
-            self.save()
-
+ 
 
 class SlotMachine(models.Model):
     casino_id = models.CharField(max_length=100)

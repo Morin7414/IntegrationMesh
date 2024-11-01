@@ -38,6 +38,12 @@ class SlotMachineMaintenanceForm(models.Model):
     completion_date = models.DateTimeField(null=True, blank=True, help_text="Date when maintenance was completed")
     initiated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
+ #   @property
+ #   def days_out_of_service(self):
+    #    if self.operational_status == 'OUT_OF_SERVICE':
+     #       return (timezone.now() - self.date_created).days
+    #    return None
+
     def __str__(self):
         return f"{self.machine} - {self.maintenance_status}"
     

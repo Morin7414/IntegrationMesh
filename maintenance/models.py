@@ -27,6 +27,14 @@ TASK_STATUS_CHOICES = [
     ('COMPLETED', 'Completed'),
 ]
 
+PART_STATUS_CHOICES = [
+    ('PENDING', 'Pending'),        
+    ('SITE_REQ', 'Site Requested'),          # Part requested by the site
+    ('CO_SENT', 'CO Sent'),                  # Central Office sent the part to the site
+    ('CO_ORDERED', 'CO Ordered'),            # Central Office ordered the part (not in stock)
+    ('FULFILLED', 'Fulfilled'),              # Request is complete, and site has received the part
+]
+
 
 # Define the SlotMachineMaintenanceForm model
 class SlotMachineMaintenanceForm(models.Model):
@@ -37,12 +45,6 @@ class SlotMachineMaintenanceForm(models.Model):
     date_created = models.DateTimeField(default=timezone.now)
     completion_date = models.DateTimeField(null=True, blank=True, help_text="Date when maintenance was completed")
     initiated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-
- #   @property
- #   def days_out_of_service(self):
-    #    if self.operational_status == 'OUT_OF_SERVICE':
-     #       return (timezone.now() - self.date_created).days
-    #    return None
 
     def __str__(self):
         return f"{self.machine} - {self.maintenance_status}"
@@ -72,14 +74,6 @@ class Task(models.Model):
         return f"Task for {self.maintenance_form} - {self.status}"
     
 
-PART_STATUS_CHOICES = [
-    ('PENDING', 'Pending'),        
-    ('SITE_REQ', 'Site Requested'),          # Part requested by the site
-    ('CO_SENT', 'CO Sent'),                  # Central Office sent the part to the site
-    ('CO_ORDERED', 'CO Ordered'),            # Central Office ordered the part (not in stock)
-    ('FULFILLED', 'Fulfilled'),              # Request is complete, and site has received the part
-]
-
 # Unified PartRequired model
 class PartRequired(models.Model):
     maintenance_form = models.ForeignKey('SlotMachineMaintenanceForm', on_delete=models.CASCADE, related_name="parts_required")
@@ -92,3 +86,156 @@ class PartRequired(models.Model):
 
     def __str__(self):
         return f"{self.part} - {self.status} in {self.maintenance_form}"
+    
+
+
+class CasinoTestRecord(models.Model):
+    maintenance_form = models.ForeignKey(SlotMachineMaintenanceForm, on_delete=models.CASCADE, related_name="casino_test_record")
+    comments = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Casino Test Record for {self.maintenance_form}"
+
+
+class SoftGMUBefore(models.Model):
+    casino_test_record = models.OneToOneField(
+        CasinoTestRecord, 
+        on_delete=models.CASCADE, 
+        related_name="soft_gmu_before"
+    )
+    non_cashable_promo_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of non-cashable promo in")
+    cashable_promo_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of cashable promo in")
+    non_cashable_promo_out = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of non-cashable promo out")
+    coin_in_bets = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of coin-in bets")
+    coin_out_wins = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of coin-out wins")
+    jackpot_handpaid = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of jackpot handpaid")
+    cash_ticket_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of cash ticket in")
+    cash_ticket_out = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of cash ticket out")
+    fives = models.IntegerField(blank=True, null=True, help_text="Before value for $5 bills")
+    tens = models.IntegerField(blank=True, null=True, help_text="Before value for $10 bills")
+    twenties = models.IntegerField(blank=True, null=True, help_text="Before value for $20 bills")
+    fifties = models.IntegerField(blank=True, null=True, help_text="Before value for $50 bills")
+    hundreds = models.IntegerField(blank=True, null=True, help_text="Before value for $100 bills")
+    player_tracking = models.IntegerField(blank=True, null=True, help_text="Player tracking value before")
+
+    def __str__(self):
+        return f"Soft GMU Before Record for {self.casino_test_record}"
+
+class SoftGMUAfter(models.Model):
+    casino_test_record = models.OneToOneField(
+        CasinoTestRecord, 
+        on_delete=models.CASCADE, 
+        related_name="soft_gmu_after"
+    )
+    non_cashable_promo_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of non-cashable promo in")
+    cashable_promo_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of cashable promo in")
+    non_cashable_promo_out = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of non-cashable promo out")
+    coin_in_bets = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of coin-in bets")
+    coin_out_wins = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of coin-out wins")
+    jackpot_handpaid = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of jackpot handpaid")
+    cash_ticket_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of cash ticket in")
+    cash_ticket_out = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of cash ticket out")
+    fives = models.IntegerField(blank=True, null=True, help_text="After value for $5 bills")
+    tens = models.IntegerField(blank=True, null=True, help_text="After value for $10 bills")
+    twenties = models.IntegerField(blank=True, null=True, help_text="After value for $20 bills")
+    fifties = models.IntegerField(blank=True, null=True, help_text="After value for $50 bills")
+    hundreds = models.IntegerField(blank=True, null=True, help_text="After value for $100 bills")
+    player_tracking = models.IntegerField(blank=True, null=True, help_text="Player tracking value after")
+
+    def __str__(self):
+        return f"Soft GMU After Record for {self.casino_test_record}"
+
+class Progressive(models.Model):
+    casino_test_record = models.ForeignKey(CasinoTestRecord, on_delete=models.CASCADE, related_name="progressive")
+    level = models.PositiveIntegerField(blank=True, null=True, help_text="Level of the progressive meter (e.g., 1 for Grand, 2 for Major)", default=1)
+    before_value = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True, help_text="Dollar amount before maintenance.")
+    after_value = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True, help_text="Dollar amount after maintenance.")
+
+
+    def __str__(self):
+        return f"Progressive Record for {self.casino_test_record}"
+
+class BetWin(models.Model):
+    casino_test_record = models.ForeignKey(CasinoTestRecord, on_delete=models.CASCADE, related_name="bet_win")
+    bet = models.DecimalField(max_digits=10, decimal_places=2)
+    won = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Bet: {self.bet}, Won: {self.won} for {self.casino_test_record}"
+
+class TestSettings(models.Model):
+    casino_test_record = models.ForeignKey(CasinoTestRecord, on_delete=models.CASCADE, related_name="test_settings")
+    promo = models.DecimalField(max_digits=5, decimal_places=2, default=5.00)
+    points = models.DecimalField(max_digits=5, decimal_places=2, default=5.00)
+    denom_5 = models.BooleanField(default=False)
+    denom_10 = models.BooleanField(default=False)
+    denom_20 = models.BooleanField(default=False)
+    denom_50 = models.BooleanField(default=False)
+    denom_100 = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Test Settings for {self.casino_test_record}"
+
+
+class Kobetron(models.Model):
+    slot_machine_maintenance_form = models.ForeignKey(
+        'SlotMachineMaintenanceForm',
+        on_delete=models.CASCADE,
+        related_name='kobetron_records'
+    )
+    rom_position = models.CharField(max_length=50, help_text="Position of the ROM")
+    program_number = models.CharField(max_length=50, help_text="Program number of the ROM")
+    mfg_date = models.DateField(help_text="Manufacturing date of the ROM")
+    kobetron_signature = models.CharField(max_length=50, help_text="Kobetron number")
+
+    technician_signature = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='technician_signatures',
+        help_text="Technician who signed off"
+    )
+    security_reviewed = models.BooleanField(
+        default=False,
+        help_text="Indicates whether security has reviewed and approved this record"
+    )
+    security_review_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Date when security reviewed the record"
+    )
+
+    def approve_by_security(self):
+        self.security_reviewed = True
+        self.security_review_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return f"Kobetron Record for {self.slot_machine_maintenance_form}"
+
+
+
+class LogicSeals(models.Model):
+    casino_test_record = models.OneToOneField(SlotMachineMaintenanceForm, on_delete=models.CASCADE, related_name="logic_seals", blank=True, null=True)
+    initial_seal_serial = models.CharField(max_length=20, blank=True, null=True, help_text="Serial number of the initial seal before accessing logic.")
+    initial_seal_verified_by_security = models.BooleanField(default=False, help_text="Has the initial seal been verified by security?")
+    initial_seal_verified_date = models.DateTimeField(blank=True, null=True, help_text="Date when the initial seal was verified by security.")
+    new_seal_serial = models.CharField(max_length=20, blank=True, null=True, help_text="Serial number of the new seal applied after work is completed.")
+    new_seal_verified_by_security = models.BooleanField(default=False, help_text="Has the new seal been verified by security?")
+    new_seal_verified_date = models.DateTimeField(blank=True, null=True, help_text="Date when the new seal was verified by security.")
+    technician = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="logic_seal_technician", help_text="Technician who applied the new seal.")
+    work_completed_date = models.DateTimeField(blank=True, null=True, help_text="Date when the technician completed their work and applied the new seal.")
+
+    def verify_initial_seal(self, security_user):
+        self.initial_seal_verified_by_security = True
+        self.initial_seal_verified_date = timezone.now()
+        self.save()
+
+    def verify_new_seal(self, security_user):
+        self.new_seal_verified_by_security = True
+        self.new_seal_verified_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return f"Logic Seals for {self.casino_test_record}"

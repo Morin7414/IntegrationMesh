@@ -1,59 +1,108 @@
 from django.contrib import admin
-from .models import SlotMachineMaintenanceForm, TroubleshootingLog, Task, PartRequired
+from .models import (
+    SlotMachineMaintenanceForm, 
+    TroubleshootingLog, 
+    Task, 
+    PartRequired, 
+    Kobetron, 
+    CasinoTestRecord, 
+    SoftGMUAfter,
+    SoftGMUBefore,
+    Progressive, 
+    BetWin, 
+    TestSettings,
+    LogicSeals
+)
 
+# Inline for TroubleshootingLog within SlotMachineMaintenanceForm
 class TroubleshootingLogInline(admin.TabularInline):
     model = TroubleshootingLog
-    extra = 1
-    fields = ('narrative', 'time_spent', 'performed_by', 'date_performed')
-    readonly_fields = ('date_performed',)
+    extra = 0
 
+# Inline for Task within SlotMachineMaintenanceForm
 class TaskInline(admin.TabularInline):
     model = Task
-    extra = 1
-    fields = ('description', 'assigned_by', 'status', 'date_assigned', 'date_completed')
-    readonly_fields = ('date_assigned',)
+    extra = 0
 
+# Inline for PartRequired within SlotMachineMaintenanceForm
 class PartRequiredInline(admin.TabularInline):
     model = PartRequired
-    extra = 1
-    fields = ('part', 'quantity', 'price_per_unit', 'status', 'date_requested', 'date_fulfilled')
-    readonly_fields = ('date_requested',)
+    extra = 0
 
-@admin.register(SlotMachineMaintenanceForm)
-class SlotMachineMaintenanceFormAdmin(admin.ModelAdmin):
-    list_display = ('machine', 'maintenance_status', 'operational_status', 'date_created', 'completion_date', 'initiated_by')
-    list_filter = ('maintenance_status', 'operational_status', 'date_created')
-    search_fields = ('machine__asset_number', 'issue_description')
-    date_hierarchy = 'date_created'
-    raw_id_fields = ('machine',)
-    inlines = [TroubleshootingLogInline, TaskInline, PartRequiredInline]
+# Inline for Kobetron within SlotMachineMaintenanceForm
+class KobetronInline(admin.TabularInline):
+    model = Kobetron
+    extra = 0
+
+# Inline for CasinoTestRecord within SlotMachineMaintenanceForm
+class CasinoTestRecordInline(admin.TabularInline):
+    model = CasinoTestRecord
+    extra = 0
+ 
+
+
+class SoftGMUBeforeInline(admin.StackedInline):
+    model = SoftGMUBefore
+    extra = 1
+
+class SoftGMUAfterInline(admin.StackedInline):
+    model = SoftGMUAfter
+    extra = 1
+   
+   
+
+class ProgressiveInline(admin.TabularInline):
+    model = Progressive
+    extra = 1
+
+class BetWinInline(admin.TabularInline):
+    model = BetWin
+    extra = 1
+
+class TestSettingsInline(admin.TabularInline):
+    model = TestSettings
+    extra = 1
+
+
+class LogicSealsInline(admin.StackedInline):
+    model = LogicSeals
+    extra = 0
+    readonly_fields = ('initial_seal_verified_date', 'new_seal_verified_date', 'work_completed_date')
     fieldsets = (
         (None, {
-            'fields': ('machine', 'issue_description', 'operational_status', 'maintenance_status', 'initiated_by')
+            'fields': ('casino_test_record',)
         }),
-        ('Dates', {
-            'fields': ('date_created', 'completion_date'),
+        ('Initial Seal Verification', {
+            'fields': (
+                'initial_seal_serial',
+                'initial_seal_verified_by_security',
+                'initial_seal_verified_date'
+            ),
+            'description': 'Security must verify the initial seal before technician access.'
+        }),
+        ('New Seal Application and Verification', {
+            'fields': (
+                'technician',
+                'work_completed_date',
+                'new_seal_serial',
+                'new_seal_verified_by_security',
+                'new_seal_verified_date'
+            ),
+            'description': 'After work is completed, a new seal is applied and verified by security.'
         }),
     )
-    readonly_fields = ('date_created',)
 
-@admin.register(TroubleshootingLog)
-class TroubleshootingLogAdmin(admin.ModelAdmin):
-    list_display = ('maintenance_form', 'performed_by', 'time_spent', 'date_performed')
-    list_filter = ('date_performed',)
-    search_fields = ('maintenance_form__machine__asset_number', 'narrative')
-    date_hierarchy = 'date_performed'
 
-@admin.register(Task)
-class TaskAdmin(admin.ModelAdmin):
-    list_display = ('maintenance_form', 'description', 'status', 'assigned_by', 'date_assigned', 'date_completed')
-    list_filter = ('status', 'date_assigned')
-    search_fields = ('maintenance_form__machine__asset_number', 'description')
-    date_hierarchy = 'date_assigned'
+# Admin for SlotMachineMaintenanceForm with inlines
+@admin.register(SlotMachineMaintenanceForm)
+class SlotMachineMaintenanceFormAdmin(admin.ModelAdmin):
+    list_display = ('machine', 'operational_status', 'maintenance_status', 'date_created', 'completion_date', 'initiated_by')
+    search_fields = ('machine__asset_number', 'maintenance_status', 'operational_status')
+    list_filter = ('operational_status', 'maintenance_status', 'date_created')
+    inlines = [TroubleshootingLogInline, TaskInline, CasinoTestRecordInline,PartRequiredInline, LogicSealsInline,KobetronInline, ]
 
-@admin.register(PartRequired)
-class PartRequiredAdmin(admin.ModelAdmin):
-    list_display = ('maintenance_form', 'part', 'quantity', 'price_per_unit', 'status', 'date_requested', 'date_fulfilled')
-    list_filter = ('status', 'date_requested')
-    search_fields = ('maintenance_form__machine__asset_number', 'part__name')
-    date_hierarchy = 'date_requested'
+# Admin for CasinoTestRecord
+@admin.register(CasinoTestRecord)
+class CasinoTestRecordAdmin(admin.ModelAdmin):
+    list_display = ('maintenance_form',)
+    inlines = [SoftGMUBeforeInline,SoftGMUAfterInline,TestSettingsInline,  ProgressiveInline, BetWinInline,]

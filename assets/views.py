@@ -64,6 +64,7 @@ def sync_all_asset_trackers(request):
     return redirect(reverse('admin:assets_assettracker_changelist'))
 
 
+#Slot machines 
 def import_csv(request): 
     if request.method == "POST" and request.FILES.get("csv_upload"):
         csv_file = request.FILES["csv_upload"]
@@ -168,6 +169,7 @@ def import_csv(request):
     form = CsvImportForm()
     return render(request, "admin/csv_form.html", {"form": form})
 
+#Asset Trackers
 def import_serials(request):
     # Process only if request is POST and contains a file
     if request.method == "POST" and request.FILES.get("csv_upload"):
@@ -212,6 +214,7 @@ def import_serials(request):
     form = CsvImportForm()
     return render(request, "admin/csv_form.html", {"form": form})
 
+#Slot Models
 def import_machine_data(request):
     if request.method == "POST" and request.FILES.get("csv_upload"):
         csv_file = request.FILES["csv_upload"]

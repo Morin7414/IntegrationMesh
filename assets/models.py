@@ -41,9 +41,8 @@ class AssetTracker(models.Model):
     preventative_maintenance_date = models.DateField(null=True, blank=True, help_text="Date of the last preventative maintenance")  # New field
 
     def __str__(self):
-        return f"Asset Tracker: {self.machine_serial_number}"
+        return f"{self.slot_machine_name} {self.slot_location} {self.machine_model_name}"
  
-
 class SlotMachine(models.Model):
     casino_id = models.CharField(max_length=100)
     slot_machine_name = models.CharField(max_length=100)

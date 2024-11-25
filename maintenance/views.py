@@ -3,12 +3,12 @@ from rest_framework.views import APIView
 from django.utils import timezone
 from .models import SlotMachineMaintenanceForm
 from .serializers import SlotMachineMaintenanceFormSerializer
-from assets.models import AssetTracker
+from slot_machines.models import EGMSlotMachine
 from django.db.models import Q
 
 class CasinoOutOfServiceView(APIView):
     def get(self, request):
-        casinos = AssetTracker.objects.filter(~Q(casino_id=""), casino_id__isnull=False).values('casino_id').distinct()
+        casinos = EGMSlotMachine.objects.filter(~Q(casino_id=""), casino_id__isnull=False).values('casino_id').distinct()
         response_data = []
 
         total_out_of_service = SlotMachineMaintenanceForm.objects.filter(operational_status='OUT_OF_SERVICE').count()

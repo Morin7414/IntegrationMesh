@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
-from assets.models import AssetTracker
+from slot_machines.models import EGMSlotMachine
 from inventory.models import  InventoryItem
 
 # Create your models here.
@@ -38,7 +38,7 @@ PART_STATUS_CHOICES = [
 
 # Define the SlotMachineMaintenanceForm model
 class SlotMachineMaintenanceForm(models.Model):
-    machine = models.ForeignKey(AssetTracker, on_delete=models.CASCADE)
+    machine = models.ForeignKey(EGMSlotMachine, on_delete=models.CASCADE)
     issue_description = models.TextField( null=True, blank=True)
     operational_status = models.CharField(max_length=20, choices=OPERATIONAL_CHOICES, default='IN_SERVICE')
     maintenance_status = models.CharField(max_length=20, choices=MAINTENANCE_STATUS_CHOICES, default='TROUBLESHOOTING')
@@ -89,92 +89,92 @@ class PartRequired(models.Model):
     
 
 
-class CasinoTestRecord(models.Model):
-    maintenance_form = models.ForeignKey(SlotMachineMaintenanceForm, on_delete=models.CASCADE, related_name="casino_test_record")
-    comments = models.TextField(blank=True, null=True)
+#class CasinoTestRecord(models.Model):
+  #  maintenance_form = models.ForeignKey(SlotMachineMaintenanceForm, on_delete=models.CASCADE, related_name="casino_test_record")
+ #   comments = models.TextField(blank=True, null=True)
 
-    def __str__(self):
-        return f"Casino Test Record for {self.maintenance_form}"
-
-
-class SoftGMUBefore(models.Model):
-    casino_test_record = models.OneToOneField(
-        CasinoTestRecord, 
-        on_delete=models.CASCADE, 
-        related_name="soft_gmu_before"
-    )
-    non_cashable_promo_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of non-cashable promo in")
-    cashable_promo_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of cashable promo in")
-    non_cashable_promo_out = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of non-cashable promo out")
-    coin_in_bets = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of coin-in bets")
-    coin_out_wins = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of coin-out wins")
-    jackpot_handpaid = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of jackpot handpaid")
-    cash_ticket_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of cash ticket in")
-    cash_ticket_out = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of cash ticket out")
-    fives = models.IntegerField(blank=True, null=True, help_text="Before value for $5 bills")
-    tens = models.IntegerField(blank=True, null=True, help_text="Before value for $10 bills")
-    twenties = models.IntegerField(blank=True, null=True, help_text="Before value for $20 bills")
-    fifties = models.IntegerField(blank=True, null=True, help_text="Before value for $50 bills")
-    hundreds = models.IntegerField(blank=True, null=True, help_text="Before value for $100 bills")
-    player_tracking = models.IntegerField(blank=True, null=True, help_text="Player tracking value before")
-
-    def __str__(self):
-        return f"Soft GMU Before Record for {self.casino_test_record}"
-
-class SoftGMUAfter(models.Model):
-    casino_test_record = models.OneToOneField(
-        CasinoTestRecord, 
-        on_delete=models.CASCADE, 
-        related_name="soft_gmu_after"
-    )
-    non_cashable_promo_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of non-cashable promo in")
-    cashable_promo_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of cashable promo in")
-    non_cashable_promo_out = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of non-cashable promo out")
-    coin_in_bets = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of coin-in bets")
-    coin_out_wins = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of coin-out wins")
-    jackpot_handpaid = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of jackpot handpaid")
-    cash_ticket_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of cash ticket in")
-    cash_ticket_out = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of cash ticket out")
-    fives = models.IntegerField(blank=True, null=True, help_text="After value for $5 bills")
-    tens = models.IntegerField(blank=True, null=True, help_text="After value for $10 bills")
-    twenties = models.IntegerField(blank=True, null=True, help_text="After value for $20 bills")
-    fifties = models.IntegerField(blank=True, null=True, help_text="After value for $50 bills")
-    hundreds = models.IntegerField(blank=True, null=True, help_text="After value for $100 bills")
-    player_tracking = models.IntegerField(blank=True, null=True, help_text="Player tracking value after")
-
-    def __str__(self):
-        return f"Soft GMU After Record for {self.casino_test_record}"
-
-class Progressive(models.Model):
-    casino_test_record = models.ForeignKey(CasinoTestRecord, on_delete=models.CASCADE, related_name="progressive")
-    level = models.PositiveIntegerField(blank=True, null=True, help_text="Level of the progressive meter (e.g., 1 for Grand, 2 for Major)", default=1)
-    before_value = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True, help_text="Dollar amount before maintenance.")
-    after_value = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True, help_text="Dollar amount after maintenance.")
+ #   def __str__(self):
+#        return f"Casino Test Record for {self.maintenance_form}"
 
 
-    def __str__(self):
-        return f"Progressive Record for {self.casino_test_record}"
+#class SoftGMUBefore(models.Model):
+  #  casino_test_record = models.OneToOneField(
+  #     CasinoTestRecord, 
+   #     on_delete=models.CASCADE, 
+   #     related_name="soft_gmu_before"
+  #  )
+  #  non_cashable_promo_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of non-cashable promo in")
+  #  cashable_promo_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of cashable promo in")
+  #  non_cashable_promo_out = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of non-cashable promo out")
+  #  coin_in_bets = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of coin-in bets")
+   # coin_out_wins = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of coin-out wins")
+   # jackpot_handpaid = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of jackpot handpaid")
+  #  cash_ticket_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of cash ticket in")
+   # cash_ticket_out = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Before value of cash ticket out")
+   # fives = models.IntegerField(blank=True, null=True, help_text="Before value for $5 bills")
+   # tens = models.IntegerField(blank=True, null=True, help_text="Before value for $10 bills")
+   # twenties = models.IntegerField(blank=True, null=True, help_text="Before value for $20 bills")
+  #  fifties = models.IntegerField(blank=True, null=True, help_text="Before value for $50 bills")
+  #  hundreds = models.IntegerField(blank=True, null=True, help_text="Before value for $100 bills")
+   # player_tracking = models.IntegerField(blank=True, null=True, help_text="Player tracking value before")
 
-class BetWin(models.Model):
-    casino_test_record = models.ForeignKey(CasinoTestRecord, on_delete=models.CASCADE, related_name="bet_win")
-    bet = models.DecimalField(max_digits=10, decimal_places=2)
-    won = models.DecimalField(max_digits=10, decimal_places=2)
+  #  def __str__(self):
+   #     return f"Soft GMU Before Record for {self.casino_test_record}"
 
-    def __str__(self):
-        return f"Bet: {self.bet}, Won: {self.won} for {self.casino_test_record}"
+#class SoftGMUAfter(models.Model):
+  #  casino_test_record = models.OneToOneField(
+   #     CasinoTestRecord, 
+   #     on_delete=models.CASCADE, 
+   #     related_name="soft_gmu_after"
+  #  )
+ #   non_cashable_promo_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of non-cashable promo in")
+ #   cashable_promo_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of cashable promo in")
+ #   non_cashable_promo_out = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of non-cashable promo out")
+  #  coin_in_bets = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of coin-in bets")
+  #  coin_out_wins = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of coin-out wins")
+ #   jackpot_handpaid = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of jackpot handpaid")
+  #  cash_ticket_in = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of cash ticket in")
+ #   cash_ticket_out = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="After value of cash ticket out")
+  #  fives = models.IntegerField(blank=True, null=True, help_text="After value for $5 bills")
+ #   tens = models.IntegerField(blank=True, null=True, help_text="After value for $10 bills")
+  #  twenties = models.IntegerField(blank=True, null=True, help_text="After value for $20 bills")
+  #  fifties = models.IntegerField(blank=True, null=True, help_text="After value for $50 bills")
+ #   hundreds = models.IntegerField(blank=True, null=True, help_text="After value for $100 bills")
+ #   player_tracking = models.IntegerField(blank=True, null=True, help_text="Player tracking value after")
 
-class TestSettings(models.Model):
-    casino_test_record = models.ForeignKey(CasinoTestRecord, on_delete=models.CASCADE, related_name="test_settings")
-    promo = models.DecimalField(max_digits=5, decimal_places=2, default=5.00)
-    points = models.DecimalField(max_digits=5, decimal_places=2, default=5.00)
-    denom_5 = models.BooleanField(default=False)
-    denom_10 = models.BooleanField(default=False)
-    denom_20 = models.BooleanField(default=False)
-    denom_50 = models.BooleanField(default=False)
-    denom_100 = models.BooleanField(default=False)
+  #  def __str__(self):
+   #     return f"Soft GMU After Record for {self.casino_test_record}"
 
-    def __str__(self):
-        return f"Test Settings for {self.casino_test_record}"
+#class Progressive(models.Model):
+  #  casino_test_record = models.ForeignKey(CasinoTestRecord, on_delete=models.CASCADE, related_name="progressive")
+   # level = models.PositiveIntegerField(blank=True, null=True, help_text="Level of the progressive meter (e.g., 1 for Grand, 2 for Major)", default=1)
+   # before_value = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True, help_text="Dollar amount before maintenance.")
+  #  after_value = models.DecimalField(max_digits=10, decimal_places=2,blank=True, null=True, help_text="Dollar amount after maintenance.")
+
+
+  #  def __str__(self):
+   #     return f"Progressive Record for {self.casino_test_record}"
+
+#class BetWin(models.Model):
+ #   casino_test_record = models.ForeignKey(CasinoTestRecord, on_delete=models.CASCADE, related_name="bet_win")
+ #   bet = models.DecimalField(max_digits=10, decimal_places=2)
+  #  won = models.DecimalField(max_digits=10, decimal_places=2)
+
+  #  def __str__(self):
+   #     return f"Bet: {self.bet}, Won: {self.won} for {self.casino_test_record}"
+
+#class TestSettings(models.Model):
+  #  casino_test_record = models.ForeignKey(CasinoTestRecord, on_delete=models.CASCADE, related_name="test_settings")
+   # promo = models.DecimalField(max_digits=5, decimal_places=2, default=5.00)
+  #  points = models.DecimalField(max_digits=5, decimal_places=2, default=5.00)
+  #  denom_5 = models.BooleanField(default=False)
+   # denom_10 = models.BooleanField(default=False)
+  #  denom_20 = models.BooleanField(default=False)
+  #  denom_50 = models.BooleanField(default=False)
+  #  denom_100 = models.BooleanField(default=False)
+
+  #  def __str__(self):
+   #     return f"Test Settings for {self.casino_test_record}"
 
 
 class Kobetron(models.Model):

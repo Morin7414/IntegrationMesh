@@ -5,12 +5,12 @@ from .models import (
     Task, 
     PartRequired, 
     Kobetron, 
-    CasinoTestRecord, 
-    SoftGMUAfter,
-    SoftGMUBefore,
-    Progressive, 
-    BetWin, 
-    TestSettings,
+ #   CasinoTestRecord, 
+ #   SoftGMUAfter,
+ #   SoftGMUBefore,
+ #   Progressive, 
+ #   BetWin, 
+ ##   TestSettings,
     LogicSeals
 )
 
@@ -33,23 +33,23 @@ class PartRequiredInline(admin.TabularInline):
 class KobetronInline(admin.TabularInline):
     model = Kobetron
     extra = 0
-
+'''
 # Inline for CasinoTestRecord within SlotMachineMaintenanceForm
-class CasinoTestRecordInline(admin.TabularInline):
-    model = CasinoTestRecord
-    extra = 0
+#class CasinoTestRecordInline(admin.TabularInline):
+ #   model = CasinoTestRecord
+  #  extra = 0
  
 
 
-class SoftGMUBeforeInline(admin.StackedInline):
-    model = SoftGMUBefore
-    extra = 1
+#class SoftGMUBeforeInline(admin.StackedInline):
+ #   model = SoftGMUBefore
+  #  extra = 1
 
-class SoftGMUAfterInline(admin.StackedInline):
-    model = SoftGMUAfter
-    extra = 1
+#class SoftGMUAfterInline(admin.StackedInline):
+ #   model = SoftGMUAfter
+ #  extra = 1
    
-   
+
 
 class ProgressiveInline(admin.TabularInline):
     model = Progressive
@@ -62,7 +62,7 @@ class BetWinInline(admin.TabularInline):
 class TestSettingsInline(admin.TabularInline):
     model = TestSettings
     extra = 1
-
+'''
 
 class LogicSealsInline(admin.StackedInline):
     model = LogicSeals
@@ -99,10 +99,12 @@ class SlotMachineMaintenanceFormAdmin(admin.ModelAdmin):
     list_display = ('machine', 'operational_status', 'maintenance_status', 'date_created', 'completion_date', 'initiated_by')
     search_fields = ('machine__asset_number', 'maintenance_status', 'operational_status')
     list_filter = ('operational_status', 'maintenance_status', 'date_created')
-    inlines = [TroubleshootingLogInline, TaskInline, CasinoTestRecordInline,PartRequiredInline, LogicSealsInline,KobetronInline, ]
-
+    inlines = [TroubleshootingLogInline, TaskInline, PartRequiredInline, LogicSealsInline,KobetronInline, ]
+    raw_id_fields = ('machine',)
+'''
 # Admin for CasinoTestRecord
 @admin.register(CasinoTestRecord)
 class CasinoTestRecordAdmin(admin.ModelAdmin):
     list_display = ('maintenance_form',)
     inlines = [SoftGMUBeforeInline,SoftGMUAfterInline,TestSettingsInline,  ProgressiveInline, BetWinInline,]
+'''

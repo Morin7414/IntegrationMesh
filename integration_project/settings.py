@@ -44,8 +44,13 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
-    'assets',
+
     'rest_framework',
+    'casinos',  # Add your new app here
+    'departmental_assets',
+    'machine_models',
+    'slot_machines',
+    'slot_importer',
     
     'maintenance',
     'inventory',

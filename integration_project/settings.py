@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'machine_models',
     'slot_machines',
     'slot_importer',
+    'live_game_test',
     
     'maintenance',
     'inventory',

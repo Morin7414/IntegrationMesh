@@ -34,7 +34,7 @@ urlpatterns = [
 
     path('departmental_assets/', include('departmental_assets.urls')),
     path('machine_models/', include('machine_models.urls')),
-    path('slot_machines/', include('slot_machines.urls')),
+   # path('slot_machines/', include('slot_machines.urls')),
     path('slot_importer/', include('slot_importer.urls')),
 
     path('api/', include('maintenance.urls')),  # This includes the urls from `myapp`

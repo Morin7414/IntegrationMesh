@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
-from slot_machines.models import EGMSlotMachine
+from slot_importer.models import SlotMachine
 from inventory.models import  InventoryItem
 
 # Create your models here.
@@ -38,7 +38,7 @@ PART_STATUS_CHOICES = [
 
 # Define the SlotMachineMaintenanceForm model
 class SlotMachineMaintenanceForm(models.Model):
-    machine = models.ForeignKey(EGMSlotMachine, on_delete=models.CASCADE,null=True, blank=True)
+    machine = models.ForeignKey(SlotMachine, on_delete=models.CASCADE,null=True, blank=True)
     issue_description = models.TextField( null=True, blank=True)
     operational_status = models.CharField(max_length=20, choices=OPERATIONAL_CHOICES, default='IN_SERVICE')
     maintenance_status = models.CharField(max_length=20, choices=MAINTENANCE_STATUS_CHOICES, default='TROUBLESHOOTING')
@@ -91,10 +91,6 @@ class PartRequired(models.Model):
         return f"{self.part} - {self.status} in {self.maintenance_form}"
     
 
-
-
-
-
 class Kobetron(models.Model):
     slot_machine_maintenance_form = models.ForeignKey(
         'SlotMachineMaintenanceForm',
@@ -131,7 +127,6 @@ class Kobetron(models.Model):
 
     def __str__(self):
         return f"Kobetron Record for {self.slot_machine_maintenance_form}"
-
 
 
 class LogicSeals(models.Model):

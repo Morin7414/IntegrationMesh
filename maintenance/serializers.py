@@ -1,10 +1,10 @@
 from rest_framework import serializers
 from .models import SlotMachineMaintenanceForm
-from slot_machines.models import EGMSlotMachine
+from slot_importer.models import SlotMachine
 from django.utils import timezone
 class AssetTrackerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EGMSlotMachine
+        model = SlotMachine
         fields = ['slot_machine_name', 'machine_serial_number', 'casino_id']  # Include casino ID
 
 class SlotMachineMaintenanceFormSerializer(serializers.ModelSerializer):

@@ -1,6 +1,6 @@
 from django.db import models
 from maintenance.models import SlotMachineMaintenanceForm
-from slot_machines.models import EGMSlotMachine
+from slot_importer.models import SlotMachine
 # Represents a test performed on a slot machine as part of maintenance
 class MachineTest(models.Model):
     maintenance_form = models.ForeignKey(
@@ -10,7 +10,7 @@ class MachineTest(models.Model):
     )
 
     machine = models.ForeignKey(
-        EGMSlotMachine, 
+        SlotMachine, 
         on_delete=models.CASCADE, 
         related_name="machine_tests",
         blank=True, 

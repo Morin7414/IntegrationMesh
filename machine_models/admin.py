@@ -5,9 +5,9 @@ from django.urls import reverse
 # Register your models here.
 @admin.register(MachineModel)
 class MachineModelAdmin(admin.ModelAdmin):
-    list_display = ['model_name', 'manufacturer', 'model_type', 'is_depreciated']
+    list_display = ['model_name', 'manufacturer', 'model_type', 'is_end_of_life']
     search_fields = ['model_name', 'manufacturer']
-    list_filter = ['is_depreciated', 'machine_move_risk']
+    list_filter = ['is_end_of_life', 'machine_move_risk']
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}

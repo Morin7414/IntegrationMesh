@@ -9,14 +9,6 @@ class MachineTest(models.Model):
         related_name="live_game_test"
     )
 
-    machine = models.ForeignKey(
-        SlotMachine, 
-        on_delete=models.CASCADE, 
-        related_name="machine_tests",
-        blank=True, 
-        null=True, 
-        help_text="The slot machine associated with this test"
-    )
 
     
 

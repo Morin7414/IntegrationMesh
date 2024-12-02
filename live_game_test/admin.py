@@ -44,7 +44,7 @@ class TestParametersInline(admin.StackedInline):
 class MachineTestAdmin(admin.ModelAdmin):
     list_display = ('maintenance_form', )
     search_fields = ('maintenance_form__name',)  # Adjust based on maintenance_form fields
-    raw_id_fields = ('maintenance_form','machine')
+    raw_id_fields = ('maintenance_form',)
     inlines = [
         SoftGMUBeforeInline,
         SoftGMUAfterInline,

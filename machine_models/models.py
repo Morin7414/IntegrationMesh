@@ -8,8 +8,15 @@ class MachineModel(models.Model):
     model_type = models.CharField(max_length=255, blank=True, null=True)
     machine_move_risk = models.CharField(max_length=20, choices=MOVE_RISK_CHOICES, blank=True, null=True, help_text="Risk associated with moving this machine")
     current_amps = models.FloatField(blank=True, null=True, help_text="Current (in amps) required by the machine")
-    is_depreciated = models.BooleanField(default=False, help_text="Indicates if the model is depreciated")
-    depreciated_since = models.DateField(blank=True, null=True, help_text="Date when the model was marked as depreciated")
+    is_end_of_life = models.BooleanField(
+    default=False, 
+    help_text="Indicates if the model is at the end of its life"
+    )
+    end_of_life_date = models.DateField(
+        blank=True, 
+        null=True, 
+        help_text="Date when the model was marked as end of life"
+    )
     dimensions = models.JSONField(blank=True, null=True, help_text="Cabinet dimensions as {'height': , 'width': , 'depth': }")
     weight = models.FloatField(blank=True, null=True, help_text="Weight of the machine in lb")
     screen_size = models.FloatField(blank=True, null=True, help_text="Screen size in inches")

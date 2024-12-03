@@ -101,7 +101,6 @@ class Kobetron(models.Model):
     program_number = models.CharField(max_length=50, help_text="Program number of the ROM")
     mfg_date = models.DateField(help_text="Manufacturing date of the ROM")
     kobetron_signature = models.CharField(max_length=50, help_text="Kobetron number")
-
     technician_signature = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -119,36 +118,52 @@ class Kobetron(models.Model):
         blank=True,
         help_text="Date when security reviewed the record"
     )
-
-    def approve_by_security(self):
-        self.security_reviewed = True
-        self.security_review_date = timezone.now()
-        self.save()
+    security_user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='kobetron_security_users',
+        help_text="Security user who performed the review"
+    )
 
     def __str__(self):
         return f"Kobetron Record for {self.slot_machine_maintenance_form}"
 
 
+
 class LogicSeals(models.Model):
-    casino_test_record = models.OneToOneField(SlotMachineMaintenanceForm, on_delete=models.CASCADE, related_name="logic_seals", blank=True, null=True)
+    casino_test_record = models.OneToOneField(
+        SlotMachineMaintenanceForm,
+        on_delete=models.CASCADE,
+        related_name="logic_seals",
+        blank=True,
+        null=True
+    )
     initial_seal_serial = models.CharField(max_length=20, blank=True, null=True, help_text="Serial number of the initial seal before accessing logic.")
     initial_seal_verified_by_security = models.BooleanField(default=False, help_text="Has the initial seal been verified by security?")
     initial_seal_verified_date = models.DateTimeField(blank=True, null=True, help_text="Date when the initial seal was verified by security.")
+    initial_seal_verified_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="initial_seal_verified_users",
+        help_text="Security user who verified the initial seal"
+    )
     new_seal_serial = models.CharField(max_length=20, blank=True, null=True, help_text="Serial number of the new seal applied after work is completed.")
     new_seal_verified_by_security = models.BooleanField(default=False, help_text="Has the new seal been verified by security?")
     new_seal_verified_date = models.DateTimeField(blank=True, null=True, help_text="Date when the new seal was verified by security.")
+    new_seal_verified_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="new_seal_verified_users",
+        help_text="Security user who verified the new seal"
+    )
     technician = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="logic_seal_technician", help_text="Technician who applied the new seal.")
     work_completed_date = models.DateTimeField(blank=True, null=True, help_text="Date when the technician completed their work and applied the new seal.")
-
-    def verify_initial_seal(self, security_user):
-        self.initial_seal_verified_by_security = True
-        self.initial_seal_verified_date = timezone.now()
-        self.save()
-
-    def verify_new_seal(self, security_user):
-        self.new_seal_verified_by_security = True
-        self.new_seal_verified_date = timezone.now()
-        self.save()
 
     def __str__(self):
         return f"Logic Seals for {self.casino_test_record}"

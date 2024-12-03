@@ -33,64 +33,13 @@ class PartRequiredInline(admin.TabularInline):
 class KobetronInline(admin.TabularInline):
     model = Kobetron
     extra = 0
-'''
-# Inline for CasinoTestRecord within SlotMachineMaintenanceForm
-#class CasinoTestRecordInline(admin.TabularInline):
- #   model = CasinoTestRecord
-  #  extra = 0
- 
 
-
-#class SoftGMUBeforeInline(admin.StackedInline):
- #   model = SoftGMUBefore
-  #  extra = 1
-
-#class SoftGMUAfterInline(admin.StackedInline):
- #   model = SoftGMUAfter
- #  extra = 1
-   
-
-
-class ProgressiveInline(admin.TabularInline):
-    model = Progressive
-    extra = 1
-
-class BetWinInline(admin.TabularInline):
-    model = BetWin
-    extra = 1
-
-class TestSettingsInline(admin.TabularInline):
-    model = TestSettings
-    extra = 1
-'''
 
 class LogicSealsInline(admin.StackedInline):
     model = LogicSeals
     extra = 0
     readonly_fields = ('initial_seal_verified_date', 'new_seal_verified_date', 'work_completed_date')
-    fieldsets = (
-        (None, {
-            'fields': ('casino_test_record',)
-        }),
-        ('Initial Seal Verification', {
-            'fields': (
-                'initial_seal_serial',
-                'initial_seal_verified_by_security',
-                'initial_seal_verified_date'
-            ),
-            'description': 'Security must verify the initial seal before technician access.'
-        }),
-        ('New Seal Application and Verification', {
-            'fields': (
-                'technician',
-                'work_completed_date',
-                'new_seal_serial',
-                'new_seal_verified_by_security',
-                'new_seal_verified_date'
-            ),
-            'description': 'After work is completed, a new seal is applied and verified by security.'
-        }),
-    )
+  
 
 
 # Admin for SlotMachineMaintenanceForm with inlines

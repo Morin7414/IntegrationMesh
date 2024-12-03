@@ -151,6 +151,17 @@ class LogicSeals(models.Model):
         related_name="initial_seal_verified_users",
         help_text="Security user who verified the initial seal"
     )
+    technician_removed = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="technicians_removed_seals",
+        help_text="Technician who removed the initial seal"
+    )
+    seal_removed_date = models.DateTimeField(blank=True, null=True, help_text="Date when the initial seal was removed by the technician.")
+
+
     new_seal_serial = models.CharField(max_length=20, blank=True, null=True, help_text="Serial number of the new seal applied after work is completed.")
     new_seal_verified_by_security = models.BooleanField(default=False, help_text="Has the new seal been verified by security?")
     new_seal_verified_date = models.DateTimeField(blank=True, null=True, help_text="Date when the new seal was verified by security.")

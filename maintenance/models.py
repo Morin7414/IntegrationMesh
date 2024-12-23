@@ -78,17 +78,17 @@ class Task(models.Model):
     
 
 # Unified PartRequired model
-class PartRequired(models.Model):
-    maintenance_form = models.ForeignKey('SlotMachineMaintenanceForm', on_delete=models.CASCADE, related_name="parts_required")
-    part = models.ForeignKey(InventoryItem, on_delete=models.CASCADE)
-    price_per_unit = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Price per individual part")
-    quantity = models.PositiveIntegerField(default=1)
-    date_requested = models.DateTimeField(default=timezone.now, help_text="Date when the part was requested")
-    date_fulfilled = models.DateTimeField(null=True, blank=True, help_text="Date when the part request was fulfilled")
-    status = models.CharField(max_length=20, choices=PART_STATUS_CHOICES, default='PENDING')
+#class PartRequired(models.Model):
+  #  maintenance_form = models.ForeignKey('SlotMachineMaintenanceForm', on_delete=models.CASCADE, related_name="parts_required")
+  #  part = models.ForeignKey(InventoryItem, on_delete=models.CASCADE)
+  #  price_per_unit = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Price per individual part")
+  #  quantity = models.PositiveIntegerField(default=1)
+   # date_requested = models.DateTimeField(default=timezone.now, help_text="Date when the part was requested")
+  #  date_fulfilled = models.DateTimeField(null=True, blank=True, help_text="Date when the part request was fulfilled")
+  #  status = models.CharField(max_length=20, choices=PART_STATUS_CHOICES, default='PENDING')
 
-    def __str__(self):
-        return f"{self.part} - {self.status} in {self.maintenance_form}"
+  #  def __str__(self):
+   #     return f"{self.part} - {self.status} in {self.maintenance_form}"
     
 
 class Kobetron(models.Model):
@@ -99,7 +99,6 @@ class Kobetron(models.Model):
     )
     rom_position = models.CharField(max_length=50, help_text="Position of the ROM")
     program_number = models.CharField(max_length=50, help_text="Program number of the ROM")
-    mfg_date = models.DateField(help_text="Manufacturing date of the ROM")
     kobetron_signature = models.CharField(max_length=50, help_text="Kobetron number")
     technician_signature = models.ForeignKey(
         User,

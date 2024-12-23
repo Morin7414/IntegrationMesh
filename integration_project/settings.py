@@ -39,7 +39,7 @@ MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = os.getenv('DEBUG', default=False)
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -49,10 +49,11 @@ INSTALLED_APPS = [
     'casinos',  # Add your new app here
     'departmental_assets',
     'machine_models',
+    'progressive',
    
     'slot_importer',
     'live_game_test',
-    
+   
     'maintenance',
     'inventory',
     'import_export',  # Remove or comment out this line

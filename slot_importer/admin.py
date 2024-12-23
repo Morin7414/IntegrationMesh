@@ -1,32 +1,20 @@
 from django.contrib import admin, messages
 from .models import SlotMachine
 
+
 from django.urls import reverse
 from django.conf import settings
 
 
 
-
 # Register your models here.
 class SlotMachineAdmin(admin.ModelAdmin):
-    list_display = (
- 
-        'slot_machine_name',
-        'slot_location',
-        'machine_serial_number',
-        'slot_game_name',
-        'machine_model_name',
-        'slot_denomination_value',
-        'last_updated',
-        'status',
-    )
+    list_display = ('slot_machine_name', 'slot_location', 'machine_serial_number', 'slot_game_name', 'machine_model_name', 'slot_denomination_value', 'last_updated', 'status')
     actions = ['delete_all_records']  # Add the custom action to actions list
+    search_fields = ['slot_machine_name', 'machine_serial_number']  # Enable search functionality   
 
-    # Enable search functionality
-    search_fields = [
-        'slot_machine_name',
-        'machine_serial_number',
-    ]
+   
+
     def delete_all_records(self, request, queryset):
         # Delete all SlotMachine records
         total_records = SlotMachine.objects.count()

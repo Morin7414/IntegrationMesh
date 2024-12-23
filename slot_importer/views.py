@@ -35,12 +35,10 @@ def import_csv(request):
                 'Casino_ID': 'casino_id',
                 'Slot_Machine_Name': 'slot_machine_name',
                 'Slot_Location': 'slot_location',
-                'Slot_Cabinet_Name': 'slot_cabinet_name',
                 'Slot_Game_Name': 'slot_game_name',
                 'Slot_Denomination_Value': 'slot_denomination_value',
                 'Slot_Status': 'status',
                 'Machine_Model_Name': 'machine_model_name',
-                'Machine_Manufacturer_Name1': 'machine_manufacturer_name1'
             }, inplace=True)
 
             # Group data for unique serial numbers
@@ -48,11 +46,9 @@ def import_csv(request):
                 'casino_id': 'first',
                 'slot_machine_name': 'first',
                 'slot_location': 'first',
-                'slot_cabinet_name': 'first',
                 'slot_game_name': 'first',
                 'machine_model_name': 'first',
                 'status': 'first',
-                'machine_manufacturer_name1': 'first',
                 'slot_denomination_value': lambda x: ', '.join(map(str, x.unique()))
             }).reset_index()
 
@@ -75,7 +71,6 @@ def import_csv(request):
                     if (
                         slot_machine.slot_machine_name != row["slot_machine_name"] or
                         slot_machine.slot_location != row["slot_location"] or
-                        slot_machine.slot_cabinet_name != row["slot_cabinet_name"] or
                         slot_machine.slot_game_name != row["slot_game_name"] or
                         slot_machine.slot_denomination_value != row["slot_denomination_value"] or
                         slot_machine.status != row["status"]
@@ -83,7 +78,6 @@ def import_csv(request):
                         # Update SlotMachine fields
                         slot_machine.slot_machine_name = row["slot_machine_name"]
                         slot_machine.slot_location = row["slot_location"]
-                        slot_machine.slot_cabinet_name = row["slot_cabinet_name"]
                         slot_machine.slot_game_name = row["slot_game_name"]
                         slot_machine.slot_denomination_value = row["slot_denomination_value"]
                         slot_machine.status = row["status"]
@@ -108,11 +102,9 @@ def import_csv(request):
                         casino=casino_instance,
                         slot_machine_name=row["slot_machine_name"],
                         slot_location=row["slot_location"],
-                        slot_cabinet_name=row["slot_cabinet_name"],
                         slot_game_name=row["slot_game_name"],
                         machine_model_name=model_instance,
                         slot_denomination_value=row["slot_denomination_value"],
-                        machine_manufacturer_name1=row["machine_manufacturer_name1"],
                         status=row["status"],
                         last_updated=now()
                     ))
@@ -124,7 +116,7 @@ def import_csv(request):
             if updated_records:
                 SlotMachine.objects.bulk_update(
                     updated_records,
-                    ['slot_machine_name', 'slot_location', 'slot_cabinet_name', 'slot_game_name',
+                    ['slot_machine_name', 'slot_location','slot_game_name',
                      'slot_denomination_value', 'status', 'last_updated']
                 )
 

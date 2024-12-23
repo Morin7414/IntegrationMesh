@@ -23,3 +23,11 @@ https://simpleisbetterthancomplex.com/tutorial/2016/07/26/how-to-reset-migration
  python manage.py migrate --fake core zero
 
  gunicorn==21.2.0
+
+ DO $$ DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+        EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+    END LOOP;
+END $$;

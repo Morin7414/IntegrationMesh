@@ -3,7 +3,7 @@ from .models import (
     SlotMachineMaintenanceForm, 
     TroubleshootingLog, 
     Task, 
-    PartRequired, 
+   # PartRequired, 
     Kobetron, 
  #   CasinoTestRecord, 
  #   SoftGMUAfter,
@@ -25,9 +25,9 @@ class TaskInline(admin.TabularInline):
     extra = 0
 
 # Inline for PartRequired within SlotMachineMaintenanceForm
-class PartRequiredInline(admin.TabularInline):
-    model = PartRequired
-    extra = 0
+#class PartRequiredInline(admin.TabularInline):
+ #   model = PartRequired
+  #  extra = 0
 
 # Inline for Kobetron within SlotMachineMaintenanceForm
 class KobetronInline(admin.TabularInline):
@@ -48,7 +48,7 @@ class SlotMachineMaintenanceFormAdmin(admin.ModelAdmin):
     list_display = ('machine', 'operational_status', 'maintenance_status', 'date_created', 'completion_date', 'initiated_by')
     search_fields = ('machine__asset_number', 'maintenance_status', 'operational_status')
     list_filter = ('operational_status', 'maintenance_status', 'date_created')
-    inlines = [TroubleshootingLogInline, TaskInline, PartRequiredInline, LogicSealsInline,KobetronInline, ]
+    inlines = [TroubleshootingLogInline, TaskInline, LogicSealsInline,KobetronInline, ]
     raw_id_fields = ('machine',)
 '''
 # Admin for CasinoTestRecord

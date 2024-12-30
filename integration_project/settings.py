@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from dotenv import load_dotenv
 import os
 from pathlib import Path
-
+from datetime import timedelta
 
 
 # Load environment variables
@@ -46,6 +46,8 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
 
     'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
     'casinos',  # Add your new app here
     'departmental_assets',
     'machine_models',
@@ -66,16 +68,52 @@ INSTALLED_APPS = [
 
 ]
 
+
+
+
+REST_FRAMEWORK = {
+
+  #  'DEFAULT_RENDERER_CLASSES': [
+   #     'rest_framework.renderers.JSONRenderer',
+    #    'rest_framework.renderers.BrowsableAPIRenderer',
+   # ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),  # Access token valid for 30 days
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30), # Refresh token valid for 30 days
+    'ROTATE_REFRESH_TOKENS': False,              # Optional: Rotate refresh tokens
+    'BLACKLIST_AFTER_ROTATION': False,           # Optional: Blacklist old refresh tokens
+}
+
+
+
+
+
+
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
 ]
 
 ROOT_URLCONF = 'integration_project.urls'

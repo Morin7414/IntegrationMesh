@@ -19,6 +19,14 @@ class SlotMachine(models.Model):
     last_updated = models.DateTimeField(default=datetime.now)
     status = models.CharField(max_length=10, default='offline')
 
+      # New fields
+    open_ticket = models.BooleanField(default=False, help_text="Indicates if there is an open maintenance ticket for the machine")
+    preventative_maintenance_date = models.DateField(
+        blank=True, 
+        null=True, 
+        help_text="The date when the last preventative maintenance was performed"
+    )
+
     banked_progressive = models.ForeignKey(
         'progressive.BankedProgressive',  # Lazy reference to avoid circular import
         on_delete=models.SET_NULL, 

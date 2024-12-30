@@ -8,11 +8,18 @@ import pandas as pd
 from django.utils.timezone import now
 from casinos.models import Casino
 from machine_models.models import MachineModel
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from .models import SlotMachine
+from .serializers import SlotMachineSerializer
 
 class CsvImportForm(forms.Form):
     csv_upload = forms.FileField()
 
 def import_csv(request):
+
     if request.method == "POST" and request.FILES.get("csv_upload"):
         csv_file = request.FILES["csv_upload"]
         try:
@@ -130,3 +137,108 @@ def import_csv(request):
     # Render the form if GET request or no file uploaded
     form = CsvImportForm()
     return render(request, "admin/csv_form.html", {"form": form})
+
+
+class MachineListAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+  #  def get(self, request):
+    #    machines = SlotMachine.objects.all()  # Fetch all machines
+     #   serializer = SlotMachineSerializer(machines, many=True)
+      #  return Response(serializer.data)
+
+    def get(self, request):
+        # Retrieve the group(s) of the authenticated user
+        user_groups = request.user.groups.values_list('name', flat=True)
+        print(f"Authenticated User: {request.user}")
+        print(f"User Groups: {list(user_groups)}")
+
+        if not user_groups:
+            print("No groups found for the user.")
+            return Response({"detail": "User does not belong to any group."}, status=403)
+
+        # Filter SlotMachine records by group name matching the casino_id
+        try:
+            machines = SlotMachine.objects.filter(casino__casino_id__in=user_groups)
+            print(f"Filtered Machines Count: {machines.count()}")
+        except Exception as e:
+            print(f"Error in filtering machines: {e}")
+            return Response({"detail": "Error filtering machines."}, status=500)
+
+        # Serialize the filtered slot machines
+        serializer = SlotMachineSerializer(machines, many=True)
+       
+        return Response(serializer.data)
+    
+
+    class SlotMachineDetailView(RetrieveAPIView):
+        queryset = SlotMachine.objects.all()
+        serializer_class = SlotMachineSerializer
+        permission_classes = [IsAuthenticated]
+        lookup_field = 'machine_serial_number'
+    
+
+    class SlotMachineDetailView(RetrieveAPIView):
+        queryset = SlotMachine.objects.all()
+        serializer_class = SlotMachineSerializer
+        permission_classes = [IsAuthenticated]
+        lookup_field = 'machine_serial_number'
+    
+
+    class SlotMachineDetailView(RetrieveAPIView):
+        queryset = SlotMachine.objects.all()
+        serializer_class = SlotMachineSerializer
+        permission_classes = [IsAuthenticated]
+        lookup_field = 'machine_serial_number'
+    
+
+    class SlotMachineDetailView(RetrieveAPIView):
+        queryset = SlotMachine.objects.all()
+        serializer_class = SlotMachineSerializer
+        permission_classes = [IsAuthenticated]
+        lookup_field = 'machine_serial_number'
+    
+
+
+    class SlotMachineDetailView(RetrieveAPIView):
+        queryset = SlotMachine.objects.all()
+        serializer_class = SlotMachineSerializer
+        permission_classes = [IsAuthenticated]
+        lookup_field = 'machine_serial_number'
+    
+
+
+    class SlotMachineDetailView(RetrieveAPIView):
+        queryset = SlotMachine.objects.all()
+        serializer_class = SlotMachineSerializer
+        permission_classes = [IsAuthenticated]
+        lookup_field = 'machine_serial_number'
+    
+
+    class SlotMachineDetailView(RetrieveAPIView):
+        queryset = SlotMachine.objects.all()
+        serializer_class = SlotMachineSerializer
+        permission_classes = [IsAuthenticated]
+        lookup_field = 'machine_serial_number'
+    
+
+    class SlotMachineDetailView(RetrieveAPIView):
+        queryset = SlotMachine.objects.all()
+        serializer_class = SlotMachineSerializer
+        permission_classes = [IsAuthenticated]
+        lookup_field = 'machine_serial_number'
+    
+
+    class SlotMachineDetailView(RetrieveAPIView):
+        queryset = SlotMachine.objects.all()
+        serializer_class = SlotMachineSerializer
+        permission_classes = [IsAuthenticated]
+        lookup_field = 'machine_serial_number'
+    
+class SlotMachineDetailView(RetrieveAPIView):
+        queryset = SlotMachine.objects.all()
+        serializer_class = SlotMachineSerializer
+        permission_classes = [IsAuthenticated]
+        lookup_field = 'machine_serial_number'
+    

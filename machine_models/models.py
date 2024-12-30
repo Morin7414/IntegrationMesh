@@ -19,7 +19,8 @@ class MachineModel(models.Model):
     model_image = models.ImageField(upload_to='model_pics/', blank=True, null=True, help_text="Image of the model")
 
     def __str__(self):
-        return f"{self.model_name} - {self.model_type or 'Unknown Type'}"
+       # return f"{self.model_name} - {self.model_type or 'Unknown Type'}"
+       return f"{self.model_name}"
 
     class Meta:
         verbose_name = "Slot Machine Model"

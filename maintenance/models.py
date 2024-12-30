@@ -39,30 +39,37 @@ PART_STATUS_CHOICES = [
 # Define the SlotMachineMaintenanceForm model
 class SlotMachineMaintenanceForm(models.Model):
     machine = models.ForeignKey(SlotMachine, on_delete=models.CASCADE,null=True, blank=True)
-    issue_description = models.TextField( null=True, blank=True)
+    first_observations = models.TextField( null=True, blank=True)
     operational_status = models.CharField(max_length=20, choices=OPERATIONAL_CHOICES, default='IN_SERVICE')
     maintenance_status = models.CharField(max_length=20, choices=MAINTENANCE_STATUS_CHOICES, default='TROUBLESHOOTING')
     date_created = models.DateTimeField(default=timezone.now)
     completion_date = models.DateTimeField(null=True, blank=True, help_text="Date when maintenance was completed")
     initiated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    image = models.ImageField(upload_to='maintenance_images/', null=True, blank=True, help_text="Upload an image related to the maintenance")
 
-#    def __str__(self):
-   #     machine_display = self.machine if self.machine else "Unknown Machine"
-   #     return f"{machine_display} - {self.maintenance_status}"
+    
 
-   #return f"{self.machine} - {self.maintenance_status}"
     
 
 # Define the TroubleshootingLog model
 class TroubleshootingLog(models.Model):
     maintenance_form = models.ForeignKey(SlotMachineMaintenanceForm, on_delete=models.CASCADE, related_name="troubleshooting_logs")
-    narrative = models.TextField(null=True, blank=True, help_text="Enter actions taken, outcome, and additional brief details")
-    time_spent = models.DurationField(help_text="Time spent on troubleshooting")
+    repair_notes = models.TextField(null=True, blank=True, help_text="Enter actions taken, outcome, and additional brief details")
+    operational_status = models.CharField(max_length=20, choices=OPERATIONAL_CHOICES, default='IN_SERVICE')
+    maintenance_status = models.CharField(max_length=20, choices=MAINTENANCE_STATUS_CHOICES, default='TROUBLESHOOTING')
+ #   time_spent = models.DurationField(help_text="Time spent on troubleshooting")
     performed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, help_text="User who performed the troubleshooting")
     date_performed = models.DateTimeField(default=timezone.now, help_text="Date and time of troubleshooting action")
+    troubleshooting_photo = models.ImageField(
+        upload_to="troubleshooting_photos/", 
+        null=True, 
+        blank=True, 
+        help_text="Upload a photo related to the troubleshooting"
+    )
+
 
     def __str__(self):
-        return f"{self.maintenance_form} - {self.action[:20]}"
+        return f"{self.maintenance_form} - {self.repair_notes[:20]}"
     
 # Define the Task model
 class Task(models.Model):

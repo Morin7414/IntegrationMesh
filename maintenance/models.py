@@ -57,7 +57,7 @@ class TroubleshootingLog(models.Model):
     repair_notes = models.TextField(null=True, blank=True, help_text="Enter actions taken, outcome, and additional brief details")
     operational_status = models.CharField(max_length=20, choices=OPERATIONAL_CHOICES, default='IN_SERVICE')
     maintenance_status = models.CharField(max_length=20, choices=MAINTENANCE_STATUS_CHOICES, default='TROUBLESHOOTING')
- #   time_spent = models.DurationField(help_text="Time spent on troubleshooting")
+
     performed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, help_text="User who performed the troubleshooting")
     date_performed = models.DateTimeField(default=timezone.now, help_text="Date and time of troubleshooting action")
     troubleshooting_photo = models.ImageField(

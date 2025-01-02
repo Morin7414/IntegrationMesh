@@ -2,8 +2,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
 from django.utils import timezone
-from .models import SlotMachineMaintenanceForm
-from .serializers import SlotMachineMaintenanceFormSerializer
+from .models import SlotMachineMaintenanceForm, TroubleshootingLog
+from .serializers import SlotMachineMaintenanceFormSerializer, TroubleshootingLogSerializer
 from slot_importer.models import SlotMachine
 from django.db.models import Q
 
@@ -108,7 +108,53 @@ class SlotMachineMaintenanceFormCreateAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
+class TroubleshootingLogCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def post(self, request):
+        data = request.data
 
+        # Get the related maintenance form
+        try:
+            maintenance_form = SlotMachineMaintenanceForm.objects.get(id=data['maintenance_form'])
+        except SlotMachineMaintenanceForm.DoesNotExist:
+            return Response({"error": "Maintenance form not found."}, status=status.HTTP_404_NOT_FOUND)
 
+        # Set defaults for operational_status and maintenance_status
+        if 'operational_status' not in data or not data['operational_status']:
+            data['operational_status'] = maintenance_form.operational_status
+        if 'maintenance_status' not in data or not data['maintenance_status']:
+            data['maintenance_status'] = maintenance_form.maintenance_status
+
+        # Add performed_by and date_performed automatically
+        serializer = TroubleshootingLogSerializer(data=data)
+        if serializer.is_valid():
+            troubleshooting_log = serializer.save(performed_by=request.user)
+
+            # Update the maintenance form statuses
+            maintenance_form.operational_status = troubleshooting_log.operational_status
+            maintenance_form.maintenance_status = troubleshooting_log.maintenance_status
+            maintenance_form.save()
+
+            # Serialize the updated maintenance form
+            maintenance_form_serializer = SlotMachineMaintenanceFormSerializer(maintenance_form)
+
+            return Response({
+                "troubleshooting_log": serializer.data,
+                "updated_maintenance_form": maintenance_form_serializer.data,
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class TroubleshootingLogListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, maintenance_form_id):
+        try:
+            logs = TroubleshootingLog.objects.filter(maintenance_form_id=maintenance_form_id).order_by('-date_performed')
+            serializer = TroubleshootingLogSerializer(logs, many=True)
+            return Response(serializer.data, status=200)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)

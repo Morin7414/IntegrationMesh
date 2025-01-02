@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SlotMachineMaintenanceForm
+from .models import SlotMachineMaintenanceForm, TroubleshootingLog
 from slot_importer.models import SlotMachine
 from django.utils import timezone
 
@@ -56,3 +56,19 @@ class SlotMachineMaintenanceFormSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("A machine must be selected.")
         return value
     
+
+class TroubleshootingLogSerializer(serializers.ModelSerializer):
+    performed_by_username = serializers.CharField(source='performed_by.username', read_only=True)
+    class Meta:
+        model = TroubleshootingLog
+        fields = [
+            'id',
+            'maintenance_form',
+            'repair_notes',
+            'operational_status',
+            'maintenance_status',
+             'performed_by_username',
+        
+            'date_performed',
+            'troubleshooting_photo',
+        ]

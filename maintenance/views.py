@@ -2,8 +2,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
 from django.utils import timezone
-from .models import SlotMachineMaintenanceForm, TroubleshootingLog
-from .serializers import SlotMachineMaintenanceFormSerializer, TroubleshootingLogSerializer
+from .models import SlotMachineMaintenanceForm, TroubleshootingLog,RequestForParts
+from .serializers import SlotMachineMaintenanceFormSerializer, TroubleshootingLogSerializer,RequestForPartsSerializer
 from slot_importer.models import SlotMachine
 from django.db.models import Q
 
@@ -149,6 +149,7 @@ class TroubleshootingLogCreateAPIView(APIView):
     
 
 class TroubleshootingLogListAPIView(APIView):
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request, maintenance_form_id):
@@ -158,3 +159,23 @@ class TroubleshootingLogListAPIView(APIView):
             return Response(serializer.data, status=200)
         except Exception as e:
             return Response({"error": str(e)}, status=400)
+        
+
+
+class RequestForPartsAPIView(APIView):
+    def get(self, request, maintenance_form_id):
+        parts = RequestForParts.objects.filter(maintenance_form_id=maintenance_form_id)
+        serializer = RequestForPartsSerializer(parts, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, maintenance_form_id):
+        try:
+            maintenance_form = SlotMachineMaintenanceForm.objects.get(id=maintenance_form_id)
+        except SlotMachineMaintenanceForm.DoesNotExist:
+            return Response({"error": "Maintenance form not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = RequestForPartsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(maintenance_form=maintenance_form)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SlotMachineMaintenanceForm, TroubleshootingLog
+from .models import SlotMachineMaintenanceForm, TroubleshootingLog,RequestForParts
 from slot_importer.models import SlotMachine
 from django.utils import timezone
 
@@ -67,8 +67,14 @@ class TroubleshootingLogSerializer(serializers.ModelSerializer):
             'repair_notes',
             'operational_status',
             'maintenance_status',
-             'performed_by_username',
+            'performed_by_username',
         
             'date_performed',
             'troubleshooting_photo',
         ]
+
+
+class RequestForPartsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RequestForParts
+        fields = '__all__'

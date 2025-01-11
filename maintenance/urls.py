@@ -1,7 +1,7 @@
 from django.urls import path, include
 
 from rest_framework.routers import DefaultRouter
-from .views import SlotMachineMaintenanceFormViewSet,CurrentUserView,SlotMachineMaintenanceFormCreateAPIView, TroubleshootingLogCreateAPIView,TroubleshootingLogListAPIView
+from .views import SlotMachineMaintenanceFormViewSet,CurrentUserView,SlotMachineMaintenanceFormCreateAPIView, TroubleshootingLogCreateAPIView,TroubleshootingLogListAPIView,RequestForPartsAPIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -27,6 +27,7 @@ urlpatterns = [
  #   path('api/troubleshootinglogs/', TroubleshootingLogCreateAPIView.as_view(), name='troubleshootinglog-create'),
     path('api/maintenanceforms/<int:maintenance_form_id>/logs/', TroubleshootingLogListAPIView.as_view(), name='troubleshootinglog-list'),
     path('api/troubleshootinglogs/', TroubleshootingLogCreateAPIView.as_view(), name='troubleshootinglog-create'),
+    path('api/maintenanceforms/<int:maintenance_form_id>/parts/', RequestForPartsAPIView.as_view(), name='parts-request'),
 
 
 

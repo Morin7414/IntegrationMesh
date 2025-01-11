@@ -47,6 +47,66 @@ class SlotMachineMaintenanceForm(models.Model):
     initiated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     image = models.ImageField(upload_to='maintenance_images/', null=True, blank=True, help_text="Upload an image related to the maintenance")
 
+
+
+class RequestForParts(models.Model):
+    # Choices
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('CANCELLED', 'Cancelled'),
+        ('CO_ORDERED', 'CO Ordered'),
+        ('SENT', 'Sent'),
+        ('RECEIVED', 'Received'),
+        ('INSTALLED', 'Installed'),
+    ]
+
+    # Relationships
+    maintenance_form = models.ForeignKey(
+        SlotMachineMaintenanceForm, 
+        on_delete=models.CASCADE, 
+        related_name="parts_required", 
+        null=True, 
+        blank=True
+    )
+    reviewed_by = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='reviewed_parts_requests'
+    )
+
+    # Part Details
+    part_number = models.CharField(max_length=255)
+    part_description = models.TextField()
+    quantity = models.PositiveIntegerField()
+    comments = models.TextField(blank=True, null=True)
+    picture = models.ImageField(upload_to='part_pictures/', blank=True, null=True)
+    quote_number = models.CharField(
+        max_length=50, 
+        blank=True, 
+        null=True, 
+        help_text="Quote number associated with the request"
+    )
+
+    # Status
+    status = models.CharField(
+        max_length=20, 
+        choices=STATUS_CHOICES, 
+        default='PENDING'
+    )
+    review_comments = models.TextField(blank=True, null=True)
+
+    # Timestamps
+    date_requested = models.DateTimeField(default=timezone.now)
+    date_ordered = models.DateTimeField(blank=True, null=True)
+    date_sent = models.DateTimeField(blank=True, null=True)
+    date_received = models.DateTimeField(blank=True, null=True)
+    date_installed = models.DateTimeField(blank=True, null=True)
+
+    # String Representation
+    def __str__(self):
+        return f"Request for {self.part_number} - {self.status}"
     
 
     
@@ -57,7 +117,6 @@ class TroubleshootingLog(models.Model):
     repair_notes = models.TextField(null=True, blank=True, help_text="Enter actions taken, outcome, and additional brief details")
     operational_status = models.CharField(max_length=20, choices=OPERATIONAL_CHOICES, default='IN_SERVICE')
     maintenance_status = models.CharField(max_length=20, choices=MAINTENANCE_STATUS_CHOICES, default='TROUBLESHOOTING')
-
     performed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, help_text="User who performed the troubleshooting")
     date_performed = models.DateTimeField(default=timezone.now, help_text="Date and time of troubleshooting action")
     troubleshooting_photo = models.ImageField(
